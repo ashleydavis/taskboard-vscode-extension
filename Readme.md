@@ -1,5 +1,11 @@
 # VSCode React extension sample
 
+Original code here: https://github.com/MikielAgutu/vscode-react-extension
+
+I've updated this example to display a Trello-style Kanban board.
+
+---
+
 Sample of a VSCode extension using React.
 
 This uses the WebView API for VSCode to create a visual extension using plain React for the front end.
