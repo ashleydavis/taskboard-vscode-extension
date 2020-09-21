@@ -2,34 +2,68 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const startCommandName = 'extension.startExtension';
-const webViewPanelTitle = 'React extension';
-const webViewPanelId = 'reactExtension';
-
 let webViewPanel : vscode.WebviewPanel;
 
 function startCommandHandler(context: vscode.ExtensionContext): void {
-  const showOptions = {
-    enableScripts: true
-  };
 
-  const panel = vscode.window.createWebviewPanel(
-    webViewPanelId,
-    webViewPanelTitle,
-    vscode.ViewColumn.One,
-    showOptions
-  );
+    const editor = vscode.window.activeTextEditor!;
+    const document = editor.document;
+    
+    console.log("Initial selected document:");
+    console.log(document.languageId);
+    console.log(document.fileName);
 
-  panel.webview.html = getHtmlForWebview();
-  panel.webview.onDidReceiveMessage(
-    onPanelDidReceiveMessage,
-    undefined,
-    context.subscriptions
-  );
+    const showOptions = {
+        enableScripts: true
+    };
 
-  panel.onDidDispose(onPanelDispose, null, context.subscriptions);
+    const panel = vscode.window.createWebviewPanel(
+        "kanban-board-extension",
+        "Kanban board",
+        vscode.ViewColumn.One,
+        showOptions
+    );
 
-  webViewPanel = panel;
+    panel.webview.html = getHtmlForWebview();
+    panel.webview.onDidReceiveMessage(
+        onPanelDidReceiveMessage,
+        undefined,
+        context.subscriptions
+    );
+
+    panel.onDidDispose(onPanelDispose, null, context.subscriptions);
+
+    webViewPanel = panel;
+
+    vscode.window.onDidChangeActiveTextEditor(e => {
+
+        if (!e) {
+            return;
+        }
+
+        const document = e!.document;
+
+        sendDocumentChangedMessage(document, panel);
+    });
+
+    sendDocumentChangedMessage(document, panel);
+}
+
+//
+// Send a message to the webview that the current document in Visual Studio Code has changed.
+//
+function sendDocumentChangedMessage(document: vscode.TextDocument, panel: vscode.WebviewPanel): void {
+    console.log("Current document in VS Code has changed:");
+    console.log(document.languageId);
+    console.log(document.fileName);
+    console.log(document.getText().slice(0, 50) + "..."); //fio:
+
+    panel.webview.postMessage({
+        command: "document-changed",
+        fileName: document.fileName,
+        languageId: document.languageId,
+        text: document.getText(),
+    });
 }
 
 function onPanelDispose(): void {
@@ -38,17 +72,19 @@ function onPanelDispose(): void {
 
 function onPanelDidReceiveMessage(message: any) {
   switch (message.command) {
+    //todo: handle save message!
+
     case 'showInformationMessage':
-      vscode.window.showInformationMessage(message.text);
+      vscode.window.showInformationMessage(message.text); //todo: what other kinds of messages can I use?
       return;
 
-    case 'getDirectoryInfo':
+    case 'getDirectoryInfo': //fio:
       runDirCommand((result : string) => webViewPanel.webview.postMessage({ command: 'getDirectoryInfo', directoryInfo: result }));
       return;
   }
 }
 
-function runDirCommand(callback : Function) {
+function runDirCommand(callback : Function) { //fio:
   var spawn = require('child_process').spawn;
   var cp = spawn(process.env.comspec, ['/c', 'dir']);
   
@@ -77,7 +113,6 @@ function getHtmlForWebview(): string {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  const startCommand = vscode.commands.registerCommand(startCommandName, () => startCommandHandler(context));
-
-  context.subscriptions.push(startCommand);
+    const startCommand = vscode.commands.registerCommand('extension.startExtension', () => startCommandHandler(context));
+    context.subscriptions.push(startCommand);
 }

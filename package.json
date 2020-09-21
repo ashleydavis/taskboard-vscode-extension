@@ -1,7 +1,7 @@
 {
-  "name": "vscode-react-extension-sample",
-  "displayName": "VsCode React extension sample",
-  "publisher": "redgate",
+  "name": "kanban-board-extension",
+  "displayName": "Kanban board extension",
+  "publisher": "ashleydavis",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -18,7 +18,7 @@
     "commands": [
       {
         "command": "extension.startExtension",
-        "title": "VsCode React extension"
+        "title": "Open Kanban board"
       }
     ]
   },

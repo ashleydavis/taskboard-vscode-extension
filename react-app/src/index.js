@@ -10,22 +10,46 @@ const Interactor = InteractorFactory.create();
 
 class Index extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = { directoryInfo: "" };
-  }
+    constructor(props) {
+        super(props);
 
-  updateFilesToDisplay() {
-    Interactor.getDirectoryInfo(directoryInfo => {
-      this.setState({ directoryInfo: directoryInfo });
-    })
-  }
+        this.state = { 
+            directoryInfo: "",
+            documentDetails: {
+                fileName: "",
+                languageId: "",
+                text: "",
+            }
+        };
 
-  render() {
-    return <>
-        <Board data={data} />
-    </>
-  }
+        Interactor.documentChangedEvent = (event) => {
+            console.log("Document has changed! Updating details.");
+            this.setState({
+                documentDetails: event,
+            });
+        };
+    }
+
+    updateFilesToDisplay() {
+        Interactor.getDirectoryInfo(directoryInfo => {
+            this.setState({ directoryInfo: directoryInfo });
+        })
+    }
+
+    render() {
+        return <>
+            <div>File name: {this.state.documentDetails.fileName}</div>
+            <div>Language ID: {this.state.documentDetails.languageId}</div>
+            <div>Content:</div>
+            <div>{this.state.documentDetails.text}</div>
+
+            {/* 
+            TEMPORARILY REMOVED THE BOARD WHILE PROTOTYPING.
+
+            <Board data={data} /> 
+            */}
+        </>
+    }
 }
 
 ReactDOM.render(<Index />, document.getElementById("index"));

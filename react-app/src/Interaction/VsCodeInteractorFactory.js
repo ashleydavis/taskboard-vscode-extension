@@ -1,42 +1,50 @@
 import Interactor from "./Interactor";
 
 const VsCodeStateChangeCallbacks = {
-  getDirectoryInfo: directoryInfo => {}
+    getDirectoryInfo: directoryInfo => {}
 }
 
 const VsCodeStateChangeBuffer = {
-  directoryInfo: ""
+    directoryInfo: ""
 }
 
 window.addEventListener('message', event => {
-  const message = event.data;
+    const message = event.data;
 
-  switch(message.command){
-    case 'getDirectoryInfo':
-      VsCodeStateChangeBuffer.directoryInfo += message.directoryInfo;
-      VsCodeStateChangeCallbacks.getDirectoryInfo(VsCodeStateChangeBuffer.directoryInfo);
-    break;
-  }
+    switch(message.command) {
+        case 'getDirectoryInfo': {
+            VsCodeStateChangeBuffer.directoryInfo += message.directoryInfo;
+            VsCodeStateChangeCallbacks.getDirectoryInfo(VsCodeStateChangeBuffer.directoryInfo);
+            break;
+        }
+
+        case "document-changed": {
+            if (Interactor.documentChangedEvent) {
+                Interactor.documentChangedEvent(message);
+            }
+            break;
+        }
+    }
 });
 
 function createFromVsCodeApi(vscode) {
-  Interactor.showInformationMessage = text =>
-    vscode.postMessage({
-    command: 'showInformationMessage',
-    text: text
-  });
+    Interactor.showInformationMessage = text =>
+        vscode.postMessage({
+            command: 'showInformationMessage',
+            text: text
+        });
 
-  Interactor.getDirectoryInfo = callback => {
-    VsCodeStateChangeCallbacks.getDirectoryInfo = callback;
-    VsCodeStateChangeBuffer.directoryInfo = "";
-    vscode.postMessage({ command: 'getDirectoryInfo' });
-  }
+    Interactor.getDirectoryInfo = callback => {
+        VsCodeStateChangeCallbacks.getDirectoryInfo = callback;
+        VsCodeStateChangeBuffer.directoryInfo = "";
+        vscode.postMessage({ command: 'getDirectoryInfo' });
+    }
 
-  return Interactor;
+    return Interactor;
 }
 
 const VsCodeInteractorFactory = {
-  createFromVsCodeApi: vscode => createFromVsCodeApi(vscode)
+    createFromVsCodeApi: vscode => createFromVsCodeApi(vscode)
 }
 
 export default VsCodeInteractorFactory;
