@@ -1,0 +1,765 @@
+{
+    "version": 2,
+    "sheet": {
+        "id": "c140df40-f7ef-11ea-ab46-01bb20ac1334",
+        "language": "javascript",
+        "cells": [
+            {
+                "id": "065600a0-f7f1-11ea-ab46-01bb20ac1334",
+                "cellType": "markdown",
+                "code": "# Try outs for Unified + Remark Parse\r\n\r\nThis JavaScript notebook is for testing out the npm library [Unified](https://www.npmjs.com/package/unified) combined with [Remark Parse](https://www.npmjs.com/package/remark-parse).\r\n\r\n**PROBLEM:**    \r\n\r\nI need to be able to deserialize a markdown file to an in-memory data structure, make changes to it then serialize it back out to a markdown file.",
+                "lastEvaluationDate": "2020-09-16T18:44:13.256+10:00",
+                "output": [],
+                "errors": [],
+                "height": 173
+            },
+            {
+                "id": "56981d50-f7f1-11ea-ab46-01bb20ac1334",
+                "cellType": "markdown",
+                "code": "## Step 1\r\n\r\nImport the libraries from npm. Data-Forge Notebook automatically detects and installs them ready for use.",
+                "lastEvaluationDate": "2020-09-16T18:44:13.257+10:00",
+                "output": [],
+                "errors": [],
+                "height": 102
+            },
+            {
+                "id": "c1410650-f7ef-11ea-ab46-01bb20ac1334",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const unified = require(\"unified\");\r\nconst markdown = require(\"remark-parse\");",
+                "lastEvaluationDate": "2020-09-16T18:30:22.679+10:00",
+                "output": [],
+                "errors": [],
+                "height": 82
+            },
+            {
+                "id": "013ebfd0-f7f1-11ea-ab46-01bb20ac1334",
+                "cellType": "markdown",
+                "code": "## Step 2\r\n\r\nLoad the test markdown file into memory and verify that it was loaded correctly.",
+                "lastEvaluationDate": "2020-09-16T18:44:13.257+10:00",
+                "output": [],
+                "errors": [],
+                "height": 102
+            },
+            {
+                "id": "82186530-f7f0-11ea-ab46-01bb20ac1334",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const datakit = require(\"datakit\");\r\n\r\nconst markdownFileContent = await datakit.readFile(\"./todo.md\");\r\ndisplay.text(markdownFileContent);",
+                "lastEvaluationDate": "2020-09-16T18:30:25.017+10:00",
+                "output": [
+                    {
+                        "value": {
+                            "displayType": "text",
+                            "data": "# Example of TODO.md\n\nThis is an example of TODO.md\n\nView the raw content of this file to understand the format.\n\n### Todo\n\n- [ ] Work on the website ~3d #feat @john 2020-03-20  \n- [ ] Fix the homepage ~1d #bug @jane  \n  - [ ] Sub-task or description  \n\n### In Progress\n\n- [ ] Work on Github Repo [JIRA-345]  \n\n### Done ✓\n\n- [x] Create my first TODO.md  "
+                        }
+                    }
+                ],
+                "errors": [],
+                "height": 118
+            },
+            {
+                "id": "683d2c80-f7f1-11ea-ab46-01bb20ac1334",
+                "cellType": "markdown",
+                "code": "## Step 3\r\n\r\nUse Unified + Remark-Parse to parse the markdown to an AST.",
+                "lastEvaluationDate": "2020-09-16T18:44:13.257+10:00",
+                "output": [],
+                "errors": [],
+                "height": 102
+            },
+            {
+                "id": "10abfce0-f7f0-11ea-ab46-01bb20ac1334",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const fromMarkdownProcessor = unified().use(markdown);\r\n\r\nconst markdownAST = processor.parse(markdownFileContent);\r\ndisplay(markdownAST);",
+                "lastEvaluationDate": "2020-09-16T18:30:25.044+10:00",
+                "output": [
+                    {
+                        "value": {
+                            "displayType": "object",
+                            "data": {
+                                "type": "root",
+                                "children": [
+                                    {
+                                        "type": "heading",
+                                        "depth": 1,
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": "Example of TODO.md",
+                                                "position": {
+                                                    "start": {
+                                                        "line": 1,
+                                                        "column": 3,
+                                                        "offset": 2
+                                                    },
+                                                    "end": {
+                                                        "line": 1,
+                                                        "column": 21,
+                                                        "offset": 20
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 1,
+                                                "column": 1,
+                                                "offset": 0
+                                            },
+                                            "end": {
+                                                "line": 1,
+                                                "column": 21,
+                                                "offset": 20
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "paragraph",
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": "This is an example of TODO.md",
+                                                "position": {
+                                                    "start": {
+                                                        "line": 3,
+                                                        "column": 1,
+                                                        "offset": 22
+                                                    },
+                                                    "end": {
+                                                        "line": 3,
+                                                        "column": 30,
+                                                        "offset": 51
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 3,
+                                                "column": 1,
+                                                "offset": 22
+                                            },
+                                            "end": {
+                                                "line": 3,
+                                                "column": 30,
+                                                "offset": 51
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "paragraph",
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": "View the raw content of this file to understand the format.",
+                                                "position": {
+                                                    "start": {
+                                                        "line": 5,
+                                                        "column": 1,
+                                                        "offset": 53
+                                                    },
+                                                    "end": {
+                                                        "line": 5,
+                                                        "column": 60,
+                                                        "offset": 112
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 5,
+                                                "column": 1,
+                                                "offset": 53
+                                            },
+                                            "end": {
+                                                "line": 5,
+                                                "column": 60,
+                                                "offset": 112
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "heading",
+                                        "depth": 3,
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": "Todo",
+                                                "position": {
+                                                    "start": {
+                                                        "line": 7,
+                                                        "column": 5,
+                                                        "offset": 118
+                                                    },
+                                                    "end": {
+                                                        "line": 7,
+                                                        "column": 9,
+                                                        "offset": 122
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 7,
+                                                "column": 1,
+                                                "offset": 114
+                                            },
+                                            "end": {
+                                                "line": 7,
+                                                "column": 9,
+                                                "offset": 122
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "list",
+                                        "ordered": false,
+                                        "start": null,
+                                        "spread": false,
+                                        "children": [
+                                            {
+                                                "type": "listItem",
+                                                "spread": false,
+                                                "checked": false,
+                                                "children": [
+                                                    {
+                                                        "type": "paragraph",
+                                                        "children": [
+                                                            {
+                                                                "type": "text",
+                                                                "value": "Work on the website ~3d #feat @john 2020-03-20  ",
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 9,
+                                                                        "column": 7,
+                                                                        "offset": 130
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 9,
+                                                                        "column": 55,
+                                                                        "offset": 178
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            }
+                                                        ],
+                                                        "position": {
+                                                            "start": {
+                                                                "line": 9,
+                                                                "column": 7,
+                                                                "offset": 130
+                                                            },
+                                                            "end": {
+                                                                "line": 9,
+                                                                "column": 55,
+                                                                "offset": 178
+                                                            },
+                                                            "indent": []
+                                                        }
+                                                    }
+                                                ],
+                                                "position": {
+                                                    "start": {
+                                                        "line": 9,
+                                                        "column": 1,
+                                                        "offset": 124
+                                                    },
+                                                    "end": {
+                                                        "line": 9,
+                                                        "column": 55,
+                                                        "offset": 178
+                                                    },
+                                                    "indent": []
+                                                }
+                                            },
+                                            {
+                                                "type": "listItem",
+                                                "spread": false,
+                                                "checked": false,
+                                                "children": [
+                                                    {
+                                                        "type": "paragraph",
+                                                        "children": [
+                                                            {
+                                                                "type": "text",
+                                                                "value": "Fix the homepage ~1d #bug @jane  ",
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 10,
+                                                                        "column": 7,
+                                                                        "offset": 185
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 10,
+                                                                        "column": 40,
+                                                                        "offset": 218
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            }
+                                                        ],
+                                                        "position": {
+                                                            "start": {
+                                                                "line": 10,
+                                                                "column": 7,
+                                                                "offset": 185
+                                                            },
+                                                            "end": {
+                                                                "line": 10,
+                                                                "column": 40,
+                                                                "offset": 218
+                                                            },
+                                                            "indent": []
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "list",
+                                                        "ordered": false,
+                                                        "start": null,
+                                                        "spread": false,
+                                                        "children": [
+                                                            {
+                                                                "type": "listItem",
+                                                                "spread": false,
+                                                                "checked": false,
+                                                                "children": [
+                                                                    {
+                                                                        "type": "paragraph",
+                                                                        "children": [
+                                                                            {
+                                                                                "type": "text",
+                                                                                "value": "Sub-task or description  ",
+                                                                                "position": {
+                                                                                    "start": {
+                                                                                        "line": 11,
+                                                                                        "column": 9,
+                                                                                        "offset": 227
+                                                                                    },
+                                                                                    "end": {
+                                                                                        "line": 11,
+                                                                                        "column": 34,
+                                                                                        "offset": 252
+                                                                                    },
+                                                                                    "indent": []
+                                                                                }
+                                                                            }
+                                                                        ],
+                                                                        "position": {
+                                                                            "start": {
+                                                                                "line": 11,
+                                                                                "column": 9,
+                                                                                "offset": 227
+                                                                            },
+                                                                            "end": {
+                                                                                "line": 11,
+                                                                                "column": 34,
+                                                                                "offset": 252
+                                                                            },
+                                                                            "indent": []
+                                                                        }
+                                                                    }
+                                                                ],
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 11,
+                                                                        "column": 3,
+                                                                        "offset": 221
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 11,
+                                                                        "column": 34,
+                                                                        "offset": 252
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            }
+                                                        ],
+                                                        "position": {
+                                                            "start": {
+                                                                "line": 11,
+                                                                "column": 3,
+                                                                "offset": 221
+                                                            },
+                                                            "end": {
+                                                                "line": 11,
+                                                                "column": 34,
+                                                                "offset": 252
+                                                            },
+                                                            "indent": []
+                                                        }
+                                                    }
+                                                ],
+                                                "position": {
+                                                    "start": {
+                                                        "line": 10,
+                                                        "column": 1,
+                                                        "offset": 179
+                                                    },
+                                                    "end": {
+                                                        "line": 11,
+                                                        "column": 34,
+                                                        "offset": 252
+                                                    },
+                                                    "indent": [
+                                                        1
+                                                    ]
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 9,
+                                                "column": 1,
+                                                "offset": 124
+                                            },
+                                            "end": {
+                                                "line": 11,
+                                                "column": 34,
+                                                "offset": 252
+                                            },
+                                            "indent": [
+                                                1,
+                                                1
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "heading",
+                                        "depth": 3,
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": "In Progress",
+                                                "position": {
+                                                    "start": {
+                                                        "line": 13,
+                                                        "column": 5,
+                                                        "offset": 258
+                                                    },
+                                                    "end": {
+                                                        "line": 13,
+                                                        "column": 16,
+                                                        "offset": 269
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 13,
+                                                "column": 1,
+                                                "offset": 254
+                                            },
+                                            "end": {
+                                                "line": 13,
+                                                "column": 16,
+                                                "offset": 269
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "list",
+                                        "ordered": false,
+                                        "start": null,
+                                        "spread": false,
+                                        "children": [
+                                            {
+                                                "type": "listItem",
+                                                "spread": false,
+                                                "checked": false,
+                                                "children": [
+                                                    {
+                                                        "type": "paragraph",
+                                                        "children": [
+                                                            {
+                                                                "type": "text",
+                                                                "value": "Work on Github Repo ",
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 15,
+                                                                        "column": 7,
+                                                                        "offset": 277
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 15,
+                                                                        "column": 27,
+                                                                        "offset": 297
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "linkReference",
+                                                                "identifier": "jira-345",
+                                                                "label": "JIRA-345",
+                                                                "referenceType": "shortcut",
+                                                                "children": [
+                                                                    {
+                                                                        "type": "text",
+                                                                        "value": "JIRA-345",
+                                                                        "position": {
+                                                                            "start": {
+                                                                                "line": 15,
+                                                                                "column": 28,
+                                                                                "offset": 298
+                                                                            },
+                                                                            "end": {
+                                                                                "line": 15,
+                                                                                "column": 36,
+                                                                                "offset": 306
+                                                                            },
+                                                                            "indent": []
+                                                                        }
+                                                                    }
+                                                                ],
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 15,
+                                                                        "column": 27,
+                                                                        "offset": 297
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 15,
+                                                                        "column": 37,
+                                                                        "offset": 307
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": "text",
+                                                                "value": "  ",
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 15,
+                                                                        "column": 37,
+                                                                        "offset": 307
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 15,
+                                                                        "column": 39,
+                                                                        "offset": 309
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            }
+                                                        ],
+                                                        "position": {
+                                                            "start": {
+                                                                "line": 15,
+                                                                "column": 7,
+                                                                "offset": 277
+                                                            },
+                                                            "end": {
+                                                                "line": 15,
+                                                                "column": 39,
+                                                                "offset": 309
+                                                            },
+                                                            "indent": []
+                                                        }
+                                                    }
+                                                ],
+                                                "position": {
+                                                    "start": {
+                                                        "line": 15,
+                                                        "column": 1,
+                                                        "offset": 271
+                                                    },
+                                                    "end": {
+                                                        "line": 15,
+                                                        "column": 39,
+                                                        "offset": 309
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 15,
+                                                "column": 1,
+                                                "offset": 271
+                                            },
+                                            "end": {
+                                                "line": 15,
+                                                "column": 39,
+                                                "offset": 309
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "heading",
+                                        "depth": 3,
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": "Done ✓",
+                                                "position": {
+                                                    "start": {
+                                                        "line": 17,
+                                                        "column": 5,
+                                                        "offset": 315
+                                                    },
+                                                    "end": {
+                                                        "line": 17,
+                                                        "column": 11,
+                                                        "offset": 321
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 17,
+                                                "column": 1,
+                                                "offset": 311
+                                            },
+                                            "end": {
+                                                "line": 17,
+                                                "column": 11,
+                                                "offset": 321
+                                            },
+                                            "indent": []
+                                        }
+                                    },
+                                    {
+                                        "type": "list",
+                                        "ordered": false,
+                                        "start": null,
+                                        "spread": false,
+                                        "children": [
+                                            {
+                                                "type": "listItem",
+                                                "spread": false,
+                                                "checked": true,
+                                                "children": [
+                                                    {
+                                                        "type": "paragraph",
+                                                        "children": [
+                                                            {
+                                                                "type": "text",
+                                                                "value": "Create my first TODO.md  ",
+                                                                "position": {
+                                                                    "start": {
+                                                                        "line": 19,
+                                                                        "column": 7,
+                                                                        "offset": 329
+                                                                    },
+                                                                    "end": {
+                                                                        "line": 19,
+                                                                        "column": 32,
+                                                                        "offset": 354
+                                                                    },
+                                                                    "indent": []
+                                                                }
+                                                            }
+                                                        ],
+                                                        "position": {
+                                                            "start": {
+                                                                "line": 19,
+                                                                "column": 7,
+                                                                "offset": 329
+                                                            },
+                                                            "end": {
+                                                                "line": 19,
+                                                                "column": 32,
+                                                                "offset": 354
+                                                            },
+                                                            "indent": []
+                                                        }
+                                                    }
+                                                ],
+                                                "position": {
+                                                    "start": {
+                                                        "line": 19,
+                                                        "column": 1,
+                                                        "offset": 323
+                                                    },
+                                                    "end": {
+                                                        "line": 19,
+                                                        "column": 32,
+                                                        "offset": 354
+                                                    },
+                                                    "indent": []
+                                                }
+                                            }
+                                        ],
+                                        "position": {
+                                            "start": {
+                                                "line": 19,
+                                                "column": 1,
+                                                "offset": 323
+                                            },
+                                            "end": {
+                                                "line": 19,
+                                                "column": 32,
+                                                "offset": 354
+                                            },
+                                            "indent": []
+                                        }
+                                    }
+                                ],
+                                "position": {
+                                    "start": {
+                                        "line": 1,
+                                        "column": 1,
+                                        "offset": 0
+                                    },
+                                    "end": {
+                                        "line": 19,
+                                        "column": 32,
+                                        "offset": 354
+                                    }
+                                }
+                            }
+                        },
+                        "height": 529
+                    }
+                ],
+                "errors": [],
+                "height": 656
+            },
+            {
+                "id": "4adb4140-f7f6-11ea-ab46-01bb20ac1334",
+                "cellType": "markdown",
+                "code": "## Step 4\r\n\r\nSerialize the AST back to markdown text to check that this can be done.",
+                "lastEvaluationDate": "2020-09-16T18:44:13.257+10:00",
+                "output": [],
+                "errors": [],
+                "height": 102
+            },
+            {
+                "id": "455a1b10-f7f6-11ea-ab46-01bb20ac1334",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const stringify = require('remark-stringify');\r\nconst toMarkdownProcessor = unified().use(stringify);\r\n\r\nconst serializedMarkdown = toMarkdownProcessor.stringify(markdownAST);\r\ndisplay.text(serializedMarkdown);",
+                "lastEvaluationDate": "2020-09-16T18:30:25.748+10:00",
+                "output": [
+                    {
+                        "value": {
+                            "displayType": "text",
+                            "data": "# Example of TODO.md\n\nThis is an example of TODO.md\n\nView the raw content of this file to understand the format.\n\n### Todo\n\n-   [ ] Work on the website ~3d #feat @john 2020-03-20  \n-   [ ] Fix the homepage ~1d #bug @jane  \n    -   [ ] Sub-task or description  \n\n### In Progress\n\n-   [ ] Work on Github Repo [JIRA-345]  \n\n### Done ✓\n\n-   [x] Create my first TODO.md  \n"
+                        }
+                    }
+                ],
+                "errors": [],
+                "height": 193
+            }
+        ]
+    }
+}

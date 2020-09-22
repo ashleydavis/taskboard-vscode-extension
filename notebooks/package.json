@@ -1,0 +1,16 @@
+{
+    "name": "notebooks",
+    "version": "1.0.0",
+    "description": "Data-Forge Notebook - A JavaScript notebook",
+    "devDependencies": {
+        "@types/chai": "^4.2.12",
+        "@types/markdown-it": "^10.0.2"
+    },
+    "dependencies": {
+        "chai": "^4.2.0",
+        "datakit": "^1.0.3",
+        "markdown-it": "^11.0.1",
+        "remark-parse": "^8.0.3",
+        "unified": "^9.2.0"
+    }
+}

@@ -1,0 +1,1125 @@
+{
+    "version": 2,
+    "sheet": {
+        "id": "e3263af0-f796-11ea-8bb4-75d84f14dc2b",
+        "language": "javascript",
+        "cells": [
+            {
+                "id": "dc0f1600-f797-11ea-8bb4-75d84f14dc2b",
+                "cellType": "markdown",
+                "code": "# Try outs for Markdown-it\r\n\r\nThis JavaScript notebook is for testing out the npm library [Markdown-it](https://www.npmjs.com/package/markdown-it).\r\n\r\n**PROBLEM:**    \r\n\r\nI need to be able to deserialize a markdown file to an in-memory data structure, make changes to it then serialize it back out to a markdown file.",
+                "lastEvaluationDate": "2020-09-16T07:21:51.367+10:00",
+                "output": [],
+                "errors": [],
+                "height": 173
+            },
+            {
+                "id": "35810900-f798-11ea-8bb4-75d84f14dc2b",
+                "cellType": "markdown",
+                "code": "## Step 1\r\n\r\nImport the library from npm. Data-Forge Notebook automatically detects it and installs it ready for use.",
+                "lastEvaluationDate": "2020-09-16T07:21:51.371+10:00",
+                "output": [],
+                "errors": [],
+                "height": 91
+            },
+            {
+                "id": "e3263af1-f796-11ea-8bb4-75d84f14dc2b",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const MarkdownIt = require(\"markdown-it\");",
+                "lastEvaluationDate": "2020-09-16T07:44:31.020+10:00",
+                "output": [],
+                "errors": [],
+                "height": 82
+            },
+            {
+                "id": "41d66cd0-f799-11ea-8bb4-75d84f14dc2b",
+                "cellType": "markdown",
+                "code": "## Step 2\r\n\r\nLoad the test markdown file into memory and verify that it was loaded correctly.",
+                "lastEvaluationDate": "2020-09-16T07:21:51.371+10:00",
+                "output": [],
+                "errors": [],
+                "height": 91
+            },
+            {
+                "id": "5064ed30-f799-11ea-8bb4-75d84f14dc2b",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const datakit = require(\"datakit\");\r\n\r\nconst markdownFileContent = await datakit.readFile(\"./todo.md\");\r\ndisplay.text(markdownFileContent)",
+                "lastEvaluationDate": "2020-09-16T07:44:33.535+10:00",
+                "output": [
+                    {
+                        "value": {
+                            "displayType": "text",
+                            "data": "# Example of TODO.md\n\nThis is an example of TODO.md\n\nView the raw content of this file to understand the format.\n\n### Todo\n\n- [ ] Work on the website ~3d #feat @john 2020-03-20  \n- [ ] Fix the homepage ~1d #bug @jane  \n  - [ ] Sub-task or description  \n\n### In Progress\n\n- [ ] Work on Github Repo [JIRA-345]  \n\n### Done ✓\n\n- [x] Create my first TODO.md  "
+                        }
+                    }
+                ],
+                "errors": [],
+                "height": 118
+            },
+            {
+                "id": "a182f580-f79a-11ea-a7e2-6f3e1e1e5ef0",
+                "cellType": "markdown",
+                "code": "## Step 3\r\n\r\nTry out Markdown-it's parse function with the markdown data that was just loaded.",
+                "lastEvaluationDate": "2020-09-16T08:40:30.067+10:00",
+                "output": [],
+                "errors": [],
+                "height": 102
+            },
+            {
+                "id": "15067e00-f79b-11ea-a7e2-6f3e1e1e5ef0",
+                "cellType": "code",
+                "cellScope": "global",
+                "code": "const markdownIt = new MarkdownIt();\r\nconst parsed = markdownIt.parse(markdownFileContent, {});\r\ndisplay(parsed);",
+                "lastEvaluationDate": "2020-09-16T07:44:33.658+10:00",
+                "output": [
+                    {
+                        "value": {
+                            "displayType": "array",
+                            "data": [
+                                {
+                                    "type": "heading_open",
+                                    "tag": "h1",
+                                    "attrs": null,
+                                    "map": [
+                                        0,
+                                        1
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "#",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        0,
+                                        1
+                                    ],
+                                    "nesting": 0,
+                                    "level": 1,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "Example of TODO.md",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "Example of TODO.md",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_close",
+                                    "tag": "h1",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "#",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        2,
+                                        3
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        2,
+                                        3
+                                    ],
+                                    "nesting": 0,
+                                    "level": 1,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "This is an example of TODO.md",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "This is an example of TODO.md",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        4,
+                                        5
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        4,
+                                        5
+                                    ],
+                                    "nesting": 0,
+                                    "level": 1,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "View the raw content of this file to understand the format.",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "View the raw content of this file to understand the format.",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_open",
+                                    "tag": "h3",
+                                    "attrs": null,
+                                    "map": [
+                                        6,
+                                        7
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "###",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        6,
+                                        7
+                                    ],
+                                    "nesting": 0,
+                                    "level": 1,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "Todo",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "Todo",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_close",
+                                    "tag": "h3",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "###",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_open",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": [
+                                        8,
+                                        12
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "list_item_open",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": [
+                                        8,
+                                        9
+                                    ],
+                                    "nesting": 1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        8,
+                                        9
+                                    ],
+                                    "nesting": 1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        8,
+                                        9
+                                    ],
+                                    "nesting": 0,
+                                    "level": 3,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "[ ] Work on the website ~3d #feat @john 2020-03-20",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "[ ] Work on the website ~3d #feat @john 2020-03-20",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "list_item_close",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "list_item_open",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": [
+                                        9,
+                                        12
+                                    ],
+                                    "nesting": 1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        9,
+                                        10
+                                    ],
+                                    "nesting": 1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        9,
+                                        10
+                                    ],
+                                    "nesting": 0,
+                                    "level": 3,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "[ ] Fix the homepage ~1d #bug @jane",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "[ ] Fix the homepage ~1d #bug @jane",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "bullet_list_open",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": [
+                                        10,
+                                        12
+                                    ],
+                                    "nesting": 1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "list_item_open",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": [
+                                        10,
+                                        12
+                                    ],
+                                    "nesting": 1,
+                                    "level": 3,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        10,
+                                        11
+                                    ],
+                                    "nesting": 1,
+                                    "level": 4,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        10,
+                                        11
+                                    ],
+                                    "nesting": 0,
+                                    "level": 5,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "[ ] Sub-task or description",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "[ ] Sub-task or description",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 4,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "list_item_close",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 3,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_close",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "list_item_close",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_close",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_open",
+                                    "tag": "h3",
+                                    "attrs": null,
+                                    "map": [
+                                        12,
+                                        13
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "###",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        12,
+                                        13
+                                    ],
+                                    "nesting": 0,
+                                    "level": 1,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "In Progress",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "In Progress",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_close",
+                                    "tag": "h3",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "###",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_open",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": [
+                                        14,
+                                        16
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "list_item_open",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": [
+                                        14,
+                                        16
+                                    ],
+                                    "nesting": 1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        14,
+                                        15
+                                    ],
+                                    "nesting": 1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        14,
+                                        15
+                                    ],
+                                    "nesting": 0,
+                                    "level": 3,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "[ ] Work on Github Repo [JIRA-345]",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "[ ] Work on Github Repo [JIRA-345]",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "list_item_close",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_close",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_open",
+                                    "tag": "h3",
+                                    "attrs": null,
+                                    "map": [
+                                        16,
+                                        17
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "###",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        16,
+                                        17
+                                    ],
+                                    "nesting": 0,
+                                    "level": 1,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "Done ✓",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "Done ✓",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "heading_close",
+                                    "tag": "h3",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "###",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_open",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": [
+                                        18,
+                                        19
+                                    ],
+                                    "nesting": 1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "list_item_open",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": [
+                                        18,
+                                        19
+                                    ],
+                                    "nesting": 1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_open",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": [
+                                        18,
+                                        19
+                                    ],
+                                    "nesting": 1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "inline",
+                                    "tag": "",
+                                    "attrs": null,
+                                    "map": [
+                                        18,
+                                        19
+                                    ],
+                                    "nesting": 0,
+                                    "level": 3,
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "tag": "",
+                                            "attrs": null,
+                                            "map": null,
+                                            "nesting": 0,
+                                            "level": 0,
+                                            "children": null,
+                                            "content": "[x] Create my first TODO.md",
+                                            "markup": "",
+                                            "info": "",
+                                            "meta": null,
+                                            "block": false,
+                                            "hidden": false
+                                        }
+                                    ],
+                                    "content": "[x] Create my first TODO.md",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "paragraph_close",
+                                    "tag": "p",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 2,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": true
+                                },
+                                {
+                                    "type": "list_item_close",
+                                    "tag": "li",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 1,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                },
+                                {
+                                    "type": "bullet_list_close",
+                                    "tag": "ul",
+                                    "attrs": null,
+                                    "map": null,
+                                    "nesting": -1,
+                                    "level": 0,
+                                    "children": null,
+                                    "content": "",
+                                    "markup": "-",
+                                    "info": "",
+                                    "meta": null,
+                                    "block": true,
+                                    "hidden": false
+                                }
+                            ]
+                        },
+                        "height": 437
+                    }
+                ],
+                "errors": [],
+                "height": 155
+            }
+        ]
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "lanes": [
+        {
+            "id": "Todo",
+            "title": "Todo",
+            "cards": [
+                {
+                    "id": "Work on the website ~3d #feat @john 2020-03-20  ",
+                    "title": "Work on the website ~3d #feat @john 2020-03-20  "
+                },
+                {
+                    "id": "Fix the homepage ~1d #bug @jane  ",
+                    "title": "Fix the homepage ~1d #bug @jane  "
+                }
+            ]
+        },
+        {
+            "id": "In Progress",
+            "title": "In Progress",
+            "cards": [
+                {
+                    "id": "Work on Github Repo ",
+                    "title": "Work on Github Repo "
+                }
+            ]
+        },
+        {
+            "id": "Done ✓",
+            "title": "Done ✓",
+            "cards": [
+                {
+                    "id": "Create my first TODO.md  ",
+                    "title": "Create my first TODO.md  "
+                }
+            ]
+        }
+    ]
+}
