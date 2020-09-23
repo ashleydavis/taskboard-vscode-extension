@@ -11,6 +11,7 @@
         "datakit": "^1.0.3",
         "markdown-it": "^11.0.1",
         "remark-parse": "^8.0.3",
+        "remark-stringify": "^8.1.1",
         "unified": "^9.2.0"
     }
 }
