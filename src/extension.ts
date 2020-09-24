@@ -42,7 +42,6 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
         }
 
         const document = e!.document;
-
         sendDocumentChangedMessage(document, panel);
     });
 
@@ -56,7 +55,11 @@ function sendDocumentChangedMessage(document: vscode.TextDocument, panel: vscode
     console.log("Current document in VS Code has changed:");
     console.log(document.languageId);
     console.log(document.fileName);
-    console.log(document.getText().slice(0, 50) + "..."); //fio:
+
+    if (document.languageId !== "markdown") {
+        console.log("Selected document is not markdown, ignoring it.");
+        return;
+    }
 
     panel.webview.postMessage({
         command: "document-changed",
