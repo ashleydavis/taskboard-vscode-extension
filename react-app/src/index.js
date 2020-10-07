@@ -6,7 +6,13 @@ import Board from 'react-trello';
 
 const unified = require("unified");
 const markdown = require("remark-parse");
+const stringify = require('remark-stringify');
+
+// Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
+
+// Converts from AST to markdown.
+const toMarkdownProcessor = unified().use(stringify);
 
 const data = require("./data.json"); //TODO: MOVE TEST DATA SO THAT IT SHOWS ONLY IN THE TEST VERSION OF THE REACT APP.
 
@@ -21,6 +27,7 @@ function markdownToBoard(markdown) {
     };
 
     const markdownAST = fromMarkdownProcessor.parse(markdown);
+
 
     //
     // Iterate children in the AST and find columns.
@@ -59,6 +66,58 @@ function markdownToBoard(markdown) {
     }
 
     return boardData;
+}
+
+//
+// Converts Kanban board data back to markdown format.
+//
+function boardToMarkdown(boardData) {
+    const markdownAST = {
+        type: "root",
+        children: [],
+    };
+
+    for (const lane of boardData.lanes) {
+
+        const laneHeadingAST = {
+            type: "heading",
+            depth: 3,
+            children: [
+                {
+                    type: "text",
+                    value: lane.title,
+                },
+            ],
+        };
+        markdownAST.children.push(laneHeadingAST);
+
+        const cardsListAST = {
+            type: "list",
+            children: [],
+        };
+        markdownAST.children.push(cardsListAST);
+
+        for (const card of lane.cards) {
+            const cardAST = {
+                type: "listItem",
+                children: [
+                    {
+                        type: "paragraph",
+                        children: [
+                            {
+                                type: "text",
+                                value: card.title,
+                            },
+                        ],
+                    },
+                ],
+            };
+            cardsListAST.children.push(cardAST);
+        }
+    }
+
+    const markdown = toMarkdownProcessor.stringify(markdownAST);    
+    return markdown;
 }
 
 class Index extends React.Component {
@@ -102,7 +161,18 @@ class Index extends React.Component {
             <div>{this.state.documentDetails.text}</div> */}
 
             {this.state.data 
-                && <Board data={this.state.data} /> 
+                && <Board 
+                    editable={true}
+                    draggable={true}
+                    canAddLanes={true}
+                    editLaneTitle={true}
+                    collapsibleLanes={true}
+                    data={this.state.data} 
+                    onDataChange={newData => {
+                        console.log("onDataChange");
+                        console.log(boardToMarkdown(newData));
+                    }}
+                    /> 
             }
         </>
     }
