@@ -40,6 +40,14 @@ function createFromVsCodeApi(vscode) {
         vscode.postMessage({ command: 'getDirectoryInfo' });
     }
 
+    Interactor.updateDocument = text => {
+        vscode.postMessage({
+            command: "update-document",
+            text: text,
+        });
+
+    };
+
     return Interactor;
 }
 

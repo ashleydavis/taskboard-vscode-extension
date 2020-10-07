@@ -155,9 +155,8 @@ class Index extends React.Component {
 
     render() {
         return <>
-            <div>File name: {this.state.documentDetails.fileName}</div>
+            {/* <div>File name: {this.state.documentDetails.fileName}</div>
             <div>Language ID: {this.state.documentDetails.languageId}</div>
-            {/* <div>Content:</div>
             <div>{this.state.documentDetails.text}</div> */}
 
             {this.state.data 
@@ -169,8 +168,23 @@ class Index extends React.Component {
                     collapsibleLanes={true}
                     data={this.state.data} 
                     onDataChange={newData => {
+
+                        //
+                        // Convert the updated board data back to markdown format.
+                        //
+                        const updatedMarkdownText = boardToMarkdown(newData);
+
+                        //
+                        // Prototype code (good for debugging):
+                        //
                         console.log("onDataChange");
-                        console.log(boardToMarkdown(newData));
+                        console.log(updatedMarkdownText);
+
+                        // 
+                        // Send the updated markdown file from the Webview back to the Extension 
+                        // to update the active document.
+                        //
+                        Interactor.updateDocument(updatedMarkdownText);
                     }}
                     /> 
             }

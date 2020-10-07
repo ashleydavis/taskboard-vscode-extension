@@ -2,7 +2,8 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-let webViewPanel : vscode.WebviewPanel;
+let webViewPanel: vscode.WebviewPanel;
+let latestMarkdownEditor: vscode.TextEditor;
 
 function startCommandHandler(context: vscode.ExtensionContext): void {
 
@@ -41,17 +42,18 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
             return;
         }
 
-        const document = e!.document;
-        sendDocumentChangedMessage(document, panel);
+        sendDocumentChangedMessage(e!, panel);
     });
 
-    sendDocumentChangedMessage(document, panel);
+    sendDocumentChangedMessage(editor, panel);
 }
 
 //
 // Send a message to the webview that the current document in Visual Studio Code has changed.
 //
-function sendDocumentChangedMessage(document: vscode.TextDocument, panel: vscode.WebviewPanel): void {
+function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.WebviewPanel): void {
+    const document = editor.document;
+
     console.log("Current document in VS Code has changed:");
     console.log(document.languageId);
     console.log(document.fileName);
@@ -60,6 +62,8 @@ function sendDocumentChangedMessage(document: vscode.TextDocument, panel: vscode
         console.log("Selected document is not markdown, ignoring it.");
         return;
     }
+
+    latestMarkdownEditor = editor;
 
     panel.webview.postMessage({
         command: "document-changed",
@@ -75,19 +79,35 @@ function onPanelDispose(): void {
 
 function onPanelDidReceiveMessage(message: any) {
   switch (message.command) {
-    //todo: handle save message!
 
     case 'showInformationMessage':
-      vscode.window.showInformationMessage(message.text); //todo: what other kinds of messages can I use?
+      vscode.window.showInformationMessage(message.text);
       return;
 
-    case 'getDirectoryInfo': //fio:
+    case 'getDirectoryInfo':
       runDirCommand((result : string) => webViewPanel.webview.postMessage({ command: 'getDirectoryInfo', directoryInfo: result }));
       return;
+
+    case "update-document": {
+        console.log(`Updating document with:`);
+        console.log(message.text);
+
+        if (latestMarkdownEditor) {
+            const document = latestMarkdownEditor.document;
+            const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
+            const fullRange = document.validateRange(invalidRange);
+            latestMarkdownEditor.edit(edit => edit.replace(fullRange, message.text));    
+        }
+        else {
+            console.error(`No latest editor.`);
+        }
+
+        return;
+    }
   }
 }
 
-function runDirCommand(callback : Function) { //fio:
+function runDirCommand(callback : Function) {
   var spawn = require('child_process').spawn;
   var cp = spawn(process.env.comspec, ['/c', 'dir']);
   
