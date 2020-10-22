@@ -14,7 +14,7 @@ The original code here was derived from this repo: https://github.com/MikielAgut
 - `npm install`
 - Press `f5`
 - Open the command selector (`ctrl+shift+p`)
-- Search for the extension (`VSCode React extension`) and press enter
+- Search for the extension (`Open Kanban board`) and press enter
 
 ### Debug the React UI by itself
 
