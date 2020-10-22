@@ -27,7 +27,7 @@
                 "cellType": "code",
                 "cellScope": "global",
                 "code": "const unified = require(\"unified\");\r\nconst markdown = require(\"remark-parse\");\r\nconst datakit = require(\"datakit\");\r\n\r\nconst fromMarkdownProcessor = unified().use(markdown);\r\n\r\nconst markdownFileContent = await datakit.readFile(\"./todo.md\");\r\nconst markdownAST = fromMarkdownProcessor.parse(markdownFileContent);\r\ndisplay(markdownAST);",
-                "lastEvaluationDate": "2020-09-20T20:33:14.133+10:00",
+                "lastEvaluationDate": "2020-10-23T07:11:53.276+10:00",
                 "output": [
                     {
                         "value": {
@@ -703,7 +703,7 @@
                 "cellType": "code",
                 "cellScope": "global",
                 "code": "function markdownToBoard(markdown) {\r\n    const boardData = {\r\n        lanes: [],\r\n    };\r\n\r\n    const markdownAST = fromMarkdownProcessor.parse(markdown);\r\n\r\n    //\r\n    // Iterate children in the AST and find columns.\r\n    //\r\n    for (let childIndex = 0; childIndex < markdownAST.children.length; ++childIndex) {\r\n        const child = markdownAST.children[childIndex];\r\n        const isLaneHeading = child.type === \"heading\" && child.depth === 3; // This child is a lane heading.\r\n        const nextChild = (childIndex + 1) < markdownAST.children.length ? markdownAST.children[childIndex + 1] : undefined;\r\n        const hasList = nextChild && nextChild.type === \"list\"; // The next child is task list.\r\n        if (isLaneHeading && hasList) {\r\n            childIndex += 1; // Account for the list.\r\n\r\n            //\r\n            // This is a columns, convert it to a \"lane\" in the board.\r\n            //\r\n            const lane = { \r\n            };\r\n            lane.title = lane.id = child.children[0].value\r\n            lane.cards = [];\r\n\r\n            boardData.lanes.push(lane);\r\n\r\n            //\r\n            // Iterate tasks in the list.\r\n            //\r\n            for (const listItem of nextChild.children) {\r\n                //\r\n                // This is a task, convert it to a \"card\" in the board.\r\n                //\r\n                const task = {};\r\n                task.title = task.id = listItem.children[0].children[0].value\r\n\r\n                lane.cards.push(task);\r\n            }\r\n        }\r\n    }\r\n\r\n    return boardData;\r\n}",
-                "lastEvaluationDate": "2020-09-20T20:33:14.651+10:00",
+                "lastEvaluationDate": "2020-10-23T07:11:53.950+10:00",
                 "output": [],
                 "errors": [],
                 "height": 897
@@ -722,7 +722,7 @@
                 "cellType": "code",
                 "cellScope": "global",
                 "code": "const { expect } = require(\"chai\");\r\n\r\nconst cannedTestData = await datakit.readJson(\"./test-data.json\");\r\n\r\nconst convertedBoardData = markdownToBoard(markdownFileContent);\r\ndisplay(convertedBoardData);\r\n\r\nexpect(convertedBoardData).to.deep.eql(cannedTestData);\r\n\r\nconsole.log(\"Test passed!\");",
-                "lastEvaluationDate": "2020-09-20T20:33:14.652+10:00",
+                "lastEvaluationDate": "2020-10-23T07:11:53.950+10:00",
                 "output": [
                     {
                         "value": {
