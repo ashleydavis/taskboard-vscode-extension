@@ -154,19 +154,22 @@ class Index extends React.Component {
     }
 
     render() {
+        // Comment this out to use test data instead.
+        const data = this.state.data;
+
         return <>
             {/* <div>File name: {this.state.documentDetails.fileName}</div>
             <div>Language ID: {this.state.documentDetails.languageId}</div>
             <div>{this.state.documentDetails.text}</div> */}
 
-            {this.state.data 
+            {data 
                 && <Board 
                     editable={true}
                     draggable={true}
                     canAddLanes={true}
                     editLaneTitle={true}
                     collapsibleLanes={true}
-                    data={this.state.data} 
+                    data={data} 
                     onDataChange={newData => {
 
                         //
