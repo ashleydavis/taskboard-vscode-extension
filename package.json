@@ -24,8 +24,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && copy react-app\\dist\\index.html out\\index.html",
-    "pretest": "npm run compile"
+    "compile": "tsc -p ./ && copy react-app\\dist\\index.html out\\index.html"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
