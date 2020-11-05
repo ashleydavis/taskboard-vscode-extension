@@ -21,6 +21,7 @@
     "node_modules",
     "out",
     "react-app",
-    ".vscode-test"
+    ".vscode-test",
+    "jest.config.ts"
   ]
 }
