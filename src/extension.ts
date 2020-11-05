@@ -7,12 +7,17 @@ let latestMarkdownEditor: vscode.TextEditor;
 
 function startCommandHandler(context: vscode.ExtensionContext): void {
 
-    const editor = vscode.window.activeTextEditor!;
-    const document = editor.document;
+    const editor = vscode.window.activeTextEditor;
+    const document = editor ? editor.document : undefined;
     
     console.log("Initial selected document:");
-    console.log(document.languageId);
-    console.log(document.fileName);
+    if (document) {
+        console.log(document.languageId);
+        console.log(document.fileName);
+    }
+    else {
+        console.log("No document");
+    }
 
     const showOptions = {
         enableScripts: true
@@ -45,7 +50,9 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
         sendDocumentChangedMessage(e!, panel);
     });
 
-    sendDocumentChangedMessage(editor, panel);
+    if (editor) {
+        sendDocumentChangedMessage(editor, panel);
+    }
 }
 
 //
