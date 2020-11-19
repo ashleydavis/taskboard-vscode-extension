@@ -1,11 +1,14 @@
 //
-// Represents Kanban board data.
+// Represents a single card/task in the Kanban board.
 //
 
 export interface ICardData {
 
 }
 
+//
+// Represents a lane/column of tasks in the Kanban board.
+//
 export interface ILaneData {
 
     id: string;
@@ -15,6 +18,9 @@ export interface ILaneData {
     cards: ICardData[];
 }
 
+//
+// Represents a Kanban board.
+//
 export interface IBoardData {
 
     lanes: ILaneData[];
