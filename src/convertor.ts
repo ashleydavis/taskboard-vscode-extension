@@ -44,6 +44,15 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
             cards: [],
         };
         boardData.lanes.push(lane);
+
+        const listRoot = markdownAST.children[childIndex + 1];
+        for (const listItem of listRoot.children) {
+            const taskText = listItem.children[0].children[0];
+            lane.cards.push({
+                id: taskText.value,
+                title: taskText.value,
+            });
+        }
     }
 
     return boardData;   

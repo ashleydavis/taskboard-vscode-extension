@@ -94,9 +94,7 @@ describe("convertor", () => {
         const columnName1 = "Task1";
         const columnName2 = "Task2";
         const columnNames = [ columnName1, columnName2 ];
-        console.log(columnNames);
         const testMarkdownAST = makeTestDataForBoardWithColumns(columnNames);
-        console.log(JSON.stringify(testMarkdownAST, null, 4)); 
 
         const boardData = markdownAstToBoarddata(testMarkdownAST);
         expect(boardData).toEqual({
@@ -116,14 +114,234 @@ describe("convertor", () => {
 
     });
 
+    it("can load a task", () => {
+        const testMarkdownAST = {
+            "type": "root",
+            "children": [
+                {
+                    "type": "heading",
+                    "depth": 3,
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Todo",
+                            "position": {
+                                "start": {
+                                    "line": 7,
+                                    "column": 5,
+                                    "offset": 118
+                                },
+                                "end": {
+                                    "line": 7,
+                                    "column": 9,
+                                    "offset": 122
+                                },
+                                "indent": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "list",
+                    "ordered": false,
+                    "start": null,
+                    "spread": false,
+                    "children": [
+                        {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": false,
+                            "children": [
+                                {
+                                    "type": "paragraph",
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "value": "Task",
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                    ]
+                }
+            ]
+        };
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toBe(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.cards).toEqual([
+            {
+                id: "Task",
+                title: "Task",
+            }
+        ]);
+    });
+
+    it("can load a task with different data", () => {
+        const testMarkdownAST = {
+            "type": "root",
+            "children": [
+                {
+                    "type": "heading",
+                    "depth": 3,
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Todo",
+                            "position": {
+                                "start": {
+                                    "line": 7,
+                                    "column": 5,
+                                    "offset": 118
+                                },
+                                "end": {
+                                    "line": 7,
+                                    "column": 9,
+                                    "offset": 122
+                                },
+                                "indent": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "list",
+                    "ordered": false,
+                    "start": null,
+                    "spread": false,
+                    "children": [
+                        {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": false,
+                            "children": [
+                                {
+                                    "type": "paragraph",
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "value": "AnotherTask",
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                    ]
+                }
+            ]
+        };
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toBe(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.cards).toEqual([
+            {
+                id: "AnotherTask",
+                title: "AnotherTask",
+            }
+        ]);
+    });
+
+    it("can load multiple tasks", () => {
+        const testMarkdownAST = {
+            "type": "root",
+            "children": [
+                {
+                    "type": "heading",
+                    "depth": 3,
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": "Todo",
+                            "position": {
+                                "start": {
+                                    "line": 7,
+                                    "column": 5,
+                                    "offset": 118
+                                },
+                                "end": {
+                                    "line": 7,
+                                    "column": 9,
+                                    "offset": 122
+                                },
+                                "indent": []
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "list",
+                    "ordered": false,
+                    "start": null,
+                    "spread": false,
+                    "children": [
+                        {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": false,
+                            "children": [
+                                {
+                                    "type": "paragraph",
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "value": "Task1",
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "listItem",
+                            "spread": false,
+                            "checked": false,
+                            "children": [
+                                {
+                                    "type": "paragraph",
+                                    "children": [
+                                        {
+                                            "type": "text",
+                                            "value": "Task2",
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                    ]
+                }
+            ]
+        };
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toBe(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.cards).toEqual([
+            {
+                id: "Task1",
+                title: "Task1",
+            },
+            {
+                id: "Task2",
+                title: "Task2",
+            }
+        ]);
+    });
+
     // 
     // loading tasks
     // 
-    //  can load a task
     //  can load a task with different data
     //  can load multiple tasks
     //  AST node path is used as lane id
     //  AST node path is used as task id
+    //
+    //  write a test that checks that where there is no list it can be handled
+    //  write tests to check required children in the AST are missing
     // 
     // editing tasks
     //
