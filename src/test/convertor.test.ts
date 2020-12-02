@@ -335,13 +335,12 @@ describe("convertor", () => {
     // 
     // loading tasks
     // 
-    //  can load a task with different data
-    //  can load multiple tasks
     //  AST node path is used as lane id
     //  AST node path is used as task id
     //
     //  write a test that checks that where there is no list it can be handled
     //  write tests to check required children in the AST are missing
+    //  tests for other edge cases
     // 
     // editing tasks
     //
