@@ -104,15 +104,11 @@ describe("convertor", () => {
         const testMarkdownAST = makeTestData([ { name: columnName } ]);
 
         const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData).toEqual({
-            lanes: [
-                {
-                    id: columnName,
-                    title: columnName,
-                    cards: [],
-                },
-            ],
-        });
+        expect(boardData.lanes.length).toEqual(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.id).toEqual(columnName);
+        expect(lane.title).toEqual(columnName);
     });
 
     it("can load a column with different data", () => {
@@ -121,15 +117,11 @@ describe("convertor", () => {
         const testMarkdownAST = makeTestData([ { name: columnName } ]);
 
         const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData).toEqual({
-            lanes: [
-                {
-                    id: columnName,
-                    title: columnName,
-                    cards: [],
-                },
-            ],
-        });
+        expect(boardData.lanes.length).toEqual(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.id).toEqual(columnName);
+        expect(lane.title).toEqual(columnName);
     });
 
     it("can load multiple columns", () => {
@@ -140,21 +132,15 @@ describe("convertor", () => {
         const testMarkdownAST = makeTestData(columns);
 
         const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData).toEqual({
-            lanes: [
-                {
-                    id: columnName1,
-                    title: columnName1,
-                    cards: [],
-                },
-                {
-                    id: columnName2,
-                    title: columnName2,
-                    cards: [],
-                },
-            ],
-        });
+        expect(boardData.lanes.length).toEqual(2);
+        
+        const lane1 = boardData.lanes[0];
+        expect(lane1.id).toEqual(columnName1);
+        expect(lane1.title).toEqual(columnName1);
 
+        const lane2 = boardData.lanes[1];
+        expect(lane2.id).toEqual(columnName2);
+        expect(lane2.title).toEqual(columnName2);
     });
 
     it("can load a task", () => {
@@ -236,17 +222,45 @@ describe("convertor", () => {
         ]);
     });
 
+    it("first loaded column has an AST path", () => {
+
+        const testMarkdownAST = makeTestData([ { name: "Column" } ]);
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toEqual(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.astPath).toEqual([ "children", 0 ]);
+    });
+
+    it("second loaded column has an AST path", () => {
+
+        const testMarkdownAST = makeTestData([ 
+            { 
+                name: "Column1",
+            },
+            { 
+                name: "Column2",
+            },
+        ]);
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toEqual(2);
+
+        const lane = boardData.lanes[1];
+        expect(lane.astPath).toEqual([ "children", 2 ]);
+    });
+ 
     // 
     // loading tasks
     // 
-    //  AST node path is used as lane id
     //  AST node path is used as task id
     //
     //  write a test that checks that where there is no list it can be handled
     //  write tests to check required children in the AST are missing
     //  tests for other edge cases
     // 
-    // editing tasks
+    // editing tests
     //
     //  can change lane title
     //  can add lane

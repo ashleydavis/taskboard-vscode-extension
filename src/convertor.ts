@@ -16,6 +16,15 @@ export interface ILaneData {
     title: string;
 
     cards: ICardData[];
+
+    //
+    // This is a path to the node for the column in the
+    // markdown AST.
+    //
+    // It allows for the AST to be edited and serialized
+    // without losing data.
+    //
+    astPath: (string | number)[];
 }
 
 //
@@ -42,6 +51,7 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
             id: columnNode.children[0].value,
             title: columnNode.children[0].value,
             cards: [],
+            astPath: [ "children", childIndex ]
         };
         boardData.lanes.push(lane);
 
