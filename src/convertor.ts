@@ -1,9 +1,26 @@
 //
+// Represents a path into the markdown AST that can be used
+// to identify a node in the AST for editing.
+//
+export type AstPath = (string | number)[];
+
+//
 // Represents a single card/task in the Kanban board.
 //
-
 export interface ICardData {
 
+    id: string;
+
+    title: string;
+
+    //
+    // This is a path to the node for the task in the
+    // markdown AST.
+    //
+    // It allows for the AST to be edited and serialized
+    // without losing data.
+    //
+    astPath: AstPath;
 }
 
 //
@@ -24,7 +41,7 @@ export interface ILaneData {
     // It allows for the AST to be edited and serialized
     // without losing data.
     //
-    astPath: (string | number)[];
+    astPath: AstPath;
 }
 
 //
@@ -56,11 +73,13 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
         boardData.lanes.push(lane);
 
         const listRoot = markdownAST.children[childIndex + 1];
-        for (const listItem of listRoot.children) {
+        for (let listItemIndex = 0; listItemIndex < listRoot.children.length; ++listItemIndex) {
+            const listItem = listRoot.children[listItemIndex];
             const taskText = listItem.children[0].children[0];
             lane.cards.push({
                 id: taskText.value,
                 title: taskText.value,
+                astPath: [ "children", 1, "children", listItemIndex ],
             });
         }
     }

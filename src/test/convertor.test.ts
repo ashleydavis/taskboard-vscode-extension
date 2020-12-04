@@ -157,14 +157,13 @@ describe("convertor", () => {
 
         const boardData = markdownAstToBoarddata(testMarkdownAST);
         expect(boardData.lanes.length).toBe(1);
-
+        
         const lane = boardData.lanes[0];
-        expect(lane.cards).toEqual([
-            {
-                id: "Task",
-                title: "Task",
-            }
-        ]);
+        expect(lane.cards.length).toEqual(1);
+
+        const card = lane.cards[0];
+        expect(card.id).toEqual("Task");
+        expect(card.title).toEqual("Task");
     });
 
     it("can load a task with different data", () => {
@@ -181,14 +180,13 @@ describe("convertor", () => {
 
         const boardData = markdownAstToBoarddata(testMarkdownAST);
         expect(boardData.lanes.length).toBe(1);
-
+        
         const lane = boardData.lanes[0];
-        expect(lane.cards).toEqual([
-            {
-                id: "AnotherTask",
-                title: "AnotherTask",
-            }
-        ]);
+        expect(lane.cards.length).toEqual(1);
+
+        const card = lane.cards[0];
+        expect(card.id).toEqual("AnotherTask");
+        expect(card.title).toEqual("AnotherTask");
     });
 
     it("can load multiple tasks", () => {
@@ -210,16 +208,15 @@ describe("convertor", () => {
         expect(boardData.lanes.length).toBe(1);
 
         const lane = boardData.lanes[0];
-        expect(lane.cards).toEqual([
-            {
-                id: "Task1",
-                title: "Task1",
-            },
-            {
-                id: "Task2",
-                title: "Task2",
-            }
-        ]);
+        expect(lane.cards.length).toEqual(2);
+
+        const card1 = lane.cards[0];
+        expect(card1.id).toEqual("Task1");
+        expect(card1.title).toEqual("Task1");
+
+        const card2 = lane.cards[1];
+        expect(card2.id).toEqual("Task2");
+        expect(card2.title).toEqual("Task2");
     });
 
     it("first loaded column has an AST path", () => {
@@ -251,10 +248,59 @@ describe("convertor", () => {
         expect(lane.astPath).toEqual([ "children", 2 ]);
     });
  
+
+    it("first loaded task has an AST path", () => {
+        const testMarkdownAST = makeTestData([
+            {
+                name: "Todo",
+                tasks: [
+                    {
+                        name: "Task",
+                    },
+                ],
+            },
+        ]);
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toEqual(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.cards.length).toEqual(1);
+
+        const card = lane.cards[0];
+        expect(card.astPath).toEqual([ "children", 1, "children", 0 ]);
+    });
+
+    it("second loaded task has an AST path", () => {
+        const testMarkdownAST = makeTestData([
+            {
+                name: "Todo",
+                tasks: [
+                    {
+                        name: "Task1",
+                    },
+                    {
+                        name: "Task2",
+                    },
+                ],
+            },
+        ]);
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toEqual(1);
+
+        const lane = boardData.lanes[0];
+        expect(lane.cards.length).toEqual(2);
+
+        const card = lane.cards[1];
+        expect(card.astPath).toEqual([ "children", 1, "children", 1 ]);
+    });
+
     // 
     // loading tasks
     // 
     //  AST node path is used as task id
+    //  task in second column can have an AST path 
     //
     //  write a test that checks that where there is no list it can be handled
     //  write tests to check required children in the AST are missing
