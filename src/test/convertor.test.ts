@@ -296,10 +296,36 @@ describe("convertor", () => {
         expect(card.astPath).toEqual([ "children", 1, "children", 1 ]);
     });
 
+    it("task from second column has an AST path", () => {
+        const testMarkdownAST = makeTestData([
+            {
+                name: "Column1",
+                tasks: [
+                ],
+            },
+            {
+                name: "Column2",
+                tasks: [
+                    {
+                        name: "Task",
+                    },
+                ],
+            },
+        ]);
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes.length).toEqual(2);
+
+        const lane = boardData.lanes[1];
+        expect(lane.cards.length).toEqual(1);
+
+        const card = lane.cards[0];
+        expect(card.astPath).toEqual([ "children", 3, "children", 0 ]);
+    });
+
     // 
     // loading tasks
     // 
-    //  AST node path is used as task id
     //  task in second column can have an AST path 
     //
     //  write a test that checks that where there is no list it can be handled
@@ -310,7 +336,7 @@ describe("convertor", () => {
     //
     //  can change lane title
     //  can add lane
-    //  can delete lane
+    //  can delete lane 
     //  can change task title
     //  can add task
     //  can delete task

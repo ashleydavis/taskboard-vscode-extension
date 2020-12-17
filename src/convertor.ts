@@ -72,14 +72,15 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
         };
         boardData.lanes.push(lane);
 
-        const listRoot = markdownAST.children[childIndex + 1];
+        const listChildIndex = childIndex + 1;
+        const listRoot = markdownAST.children[listChildIndex];
         for (let listItemIndex = 0; listItemIndex < listRoot.children.length; ++listItemIndex) {
             const listItem = listRoot.children[listItemIndex];
             const taskText = listItem.children[0].children[0];
             lane.cards.push({
                 id: taskText.value,
                 title: taskText.value,
-                astPath: [ "children", 1, "children", listItemIndex ],
+                astPath: [ "children", listChildIndex, "children", listItemIndex ],
             });
         }
     }
