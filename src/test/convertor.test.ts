@@ -1,92 +1,93 @@
-import { markdownAstToBoarddata } from "../convertor";
+import { AstPath, editLaneName, markdownAstToBoarddata } from "../convertor";
 
-describe("convertor", () => {
+//
+// Interfaces for creating test data.
+//
 
-    //
-    // Interfaces for creating test data.
-    //
+interface ITestTask {
+    // The name of the task.
+    name: string;
+}
 
-    interface ITestTask {
-        // The name of the task.
-        name: string;
-    }
+interface ITestColumn {
+    // The name of the column.
+    name: string;
 
-    interface ITestColumn {
-        // The name of the column.
-        name: string;
+    // Tasks in this column.
+    tasks?: ITestTask[];
+}
 
-        // Tasks in this column.
-        tasks?: ITestTask[];
-    }
+//
+// Function to create test data.
+//
+function makeTestData(columns: ITestColumn[]): any {
+    const children: any[] = [];
 
-    //
-    // Function to create test data.
-    //
-    function makeTestData(columns: ITestColumn[]): any {
-        const children: any[] = [];
+    for (const column of columns) {
+        const columnName = column.name;
+        children.push({
+            "type": "heading",
+            "depth": 3,
+            "children": [
+                {
+                    "type": "text",
+                    "value": columnName,
+                    "position": {
+                        "start": {
+                            "line": 7,
+                            "column": 5,
+                            "offset": 118
+                        },
+                        "end": {
+                            "line": 7,
+                            "column": 9,
+                            "offset": 122
+                        },
+                        "indent": []
+                    }
+                },
+            ],
+        });
 
-        for (const column of columns) {
-            const columnName = column.name;
-            children.push({
-                "type": "heading",
-                "depth": 3,
-                "children": [
-                    {
-                        "type": "text",
-                        "value": columnName,
-                        "position": {
-                            "start": {
-                                "line": 7,
-                                "column": 5,
-                                "offset": 118
-                            },
-                            "end": {
-                                "line": 7,
-                                "column": 9,
-                                "offset": 122
-                            },
-                            "indent": []
+        const columnChildren: any[] = [];
+        if (column.tasks) {
+            for (const task of column.tasks) {
+                columnChildren.push({
+                    "type": "listItem",
+                    "spread": false,
+                    "checked": false,
+                    "children": [
+                        {
+                            "type": "paragraph",
+                            "children": [
+                                {
+                                    "type": "text",
+                                    "value": task.name,
+                                }
+                            ]
                         }
-                    },
-                ],
-            });
-
-            const columnChildren: any[] = [];
-            if (column.tasks) {
-                for (const task of column.tasks) {
-                    columnChildren.push({
-                        "type": "listItem",
-                        "spread": false,
-                        "checked": false,
-                        "children": [
-                            {
-                                "type": "paragraph",
-                                "children": [
-                                    {
-                                        "type": "text",
-                                        "value": task.name,
-                                    }
-                                ]
-                            }
-                        ]
-                    });
-                }
+                    ]
+                });
             }
-
-            children.push({
-                "type": "list",
-                "ordered": false,
-                "start": null,
-                "spread": false,
-                "children": columnChildren,
-            });
         }
-   
-        return {
-            "type": "root",
-            "children": children,
-        };
+
+        children.push({
+            "type": "list",
+            "ordered": false,
+            "start": null,
+            "spread": false,
+            "children": columnChildren,
+        });
     }
+
+    return {
+        "type": "root",
+        "children": children,
+    };
+}
+
+describe("deserialize markdown to board data", () => {
+
 
     it("can load empty board", () => {
         const emptyMarkdownAST = { 
@@ -326,8 +327,6 @@ describe("convertor", () => {
     // 
     // loading tasks
     // 
-    //  task in second column can have an AST path 
-    //
     //  write a test that checks that where there is no list it can be handled
     //  write tests to check required children in the AST are missing
     //  tests for other edge cases
@@ -341,5 +340,25 @@ describe("convertor", () => {
     //  can add task
     //  can delete task
 
+    //
+    // Todo
+    //
+    // Put type defs on markdown AST.
+    //
+
 });
 
+describe("update board data to markdown", () => {
+
+    it("can update lane name in markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([ { name: "Old name" } ]);
+        const laneAstPath = [ "children", 0 ];
+
+        editLaneName(laneAstPath, "New name", testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ { name: "New name" } ]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
+    });
+
+});

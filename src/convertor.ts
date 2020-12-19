@@ -2,6 +2,8 @@
 // Represents a path into the markdown AST that can be used
 // to identify a node in the AST for editing.
 //
+import * as R from "ramda";
+
 export type AstPath = (string | number)[];
 
 //
@@ -86,4 +88,14 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
     }
 
     return boardData;   
+}
+
+//
+// Edits the name of a lane in the Kanboard back into the markdown AST.
+//
+export function editLaneName(laneAstPath: AstPath, newLaneName: string, markdownAST: any): void {
+    const fullLaneAstPath = laneAstPath.concat(["children", 0]);
+    const laneTitleNode = R.path<any>(fullLaneAstPath, markdownAST);
+
+    laneTitleNode.value = newLaneName;
 }
