@@ -150,3 +150,36 @@ export function editTaskName(taskId: AstPath, newTaskName: string, markdownAST: 
 
     taskTitleNode.value = newTaskName;
 }
+
+//
+// Adds a new task to the lane.
+//
+export function addNewTask(laneId: AstPath, newTaskName: string, markdownAST: any): void {
+    const laneNode = R.path<any>(laneId, markdownAST);
+    if (!laneNode) {
+        return;
+    }
+    
+    const laneNodeIndex =  R.findIndex(child => child === laneNode, markdownAST.children)
+    if (laneNodeIndex === -1) {
+        return;
+    }
+
+    const listNode = markdownAST.children[laneNodeIndex+1];
+    listNode.children.push({
+        "type": "listItem",
+        "spread": false,
+        "checked": false,
+        "children": [
+            {
+                "type": "paragraph",
+                "children": [
+                    {
+                        "type": "text",
+                        "value": newTaskName,
+                    }
+                ]
+            }
+        ]
+});
+}

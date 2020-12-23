@@ -1,4 +1,4 @@
-import { addNewLane, AstPath, editLaneName, editTaskName, markdownAstToBoarddata, removeLane } from "../convertor";
+import { addNewLane, addNewTask, AstPath, editLaneName, editTaskName, markdownAstToBoarddata, removeLane } from "../convertor";
 
 //
 // Interfaces for creating test data.
@@ -420,6 +420,67 @@ describe("update board data to markdown", () => {
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
     });
 
+    it("can add a task to an empty lane in markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([ 
+            { 
+                name: "Lane", 
+                tasks: [
+                ],
+            },
+        ]);
+        
+        const laneId = [ "children", 0 ];
+
+        addNewTask(laneId, "New task name", testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ 
+            { 
+                name: "Lane", 
+                tasks: [
+                    {
+                        name: "New task name",
+                    },
+                ],
+            },
+        ]);
+
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
+    });
+
+    it("can add a new task to a lane in markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([ 
+            { 
+                name: "Lane", 
+                tasks: [
+                    {
+                        name: "Task1",
+                    },
+                ],
+            },
+        ]);
+        
+        const laneId = [ "children", 0 ];
+
+        addNewTask(laneId, "Task2", testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ 
+            { 
+                name: "Lane", 
+                tasks: [
+                    {
+                        name: "Task1",
+                    },
+                    {
+                        name: "Task2",
+                    },
+                ],
+            },
+        ]);
+
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
+    });
 });
 
 // 
@@ -431,7 +492,6 @@ describe("update board data to markdown", () => {
 // 
 // editing tests
 //
-//  can change task title
 //  can add task
 //  can delete task
 //  handles deleting a lane from an empty board
