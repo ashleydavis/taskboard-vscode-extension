@@ -1,4 +1,4 @@
-import { AstPath, editLaneName, markdownAstToBoarddata } from "../convertor";
+import { addNewLane, AstPath, editLaneName, markdownAstToBoarddata } from "../convertor";
 
 //
 // Interfaces for creating test data.
@@ -32,19 +32,6 @@ function makeTestData(columns: ITestColumn[]): any {
                 {
                     "type": "text",
                     "value": columnName,
-                    "position": {
-                        "start": {
-                            "line": 7,
-                            "column": 5,
-                            "offset": 118
-                        },
-                        "end": {
-                            "line": 7,
-                            "column": 9,
-                            "offset": 122
-                        },
-                        "indent": []
-                    }
                 },
             ],
         });
@@ -333,8 +320,6 @@ describe("deserialize markdown to board data", () => {
     // 
     // editing tests
     //
-    //  can change lane title
-    //  can add lane
     //  can delete lane 
     //  can change task title
     //  can add task
@@ -361,4 +346,26 @@ describe("update board data to markdown", () => {
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
     });
 
+    it("can add new lane to empty markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([]);
+
+        addNewLane("New lane", testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ { name: "New lane" } ]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
+    });
+
+    it("can add new lane to existing markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([ { name: "Existing lane" } ]);
+
+        addNewLane("New lane", testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ 
+            { name: "Existing lane" }, 
+            { name: "New lane" },
+        ]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
+    });
 });

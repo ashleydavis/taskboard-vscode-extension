@@ -99,3 +99,27 @@ export function editLaneName(laneAstPath: AstPath, newLaneName: string, markdown
 
     laneTitleNode.value = newLaneName;
 }
+
+//
+// Adds a new lane to markdown AST.
+//
+export function addNewLane(newLaneName: string, markdownAST: any): void {
+    markdownAST.children.push({
+        "type": "heading",
+        "depth": 3,
+        "children": [
+            {
+                "type": "text",
+                "value": newLaneName,
+            },
+        ],
+    });
+
+    markdownAST.children.push({
+        "type": "list",
+        "ordered": false,
+        "start": null,
+        "spread": false,
+        "children": []
+    });
+}
