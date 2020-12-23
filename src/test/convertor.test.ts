@@ -1,4 +1,4 @@
-import { addNewLane, AstPath, editLaneName, markdownAstToBoarddata } from "../convertor";
+import { addNewLane, AstPath, editLaneName, markdownAstToBoarddata, removeLane } from "../convertor";
 
 //
 // Interfaces for creating test data.
@@ -10,6 +10,7 @@ interface ITestTask {
 }
 
 interface ITestColumn {
+
     // The name of the column.
     name: string;
 
@@ -320,10 +321,13 @@ describe("deserialize markdown to board data", () => {
     // 
     // editing tests
     //
-    //  can delete lane 
     //  can change task title
     //  can add task
     //  can delete task
+    //  handles deleting a lane from an empty board
+    //  handles removing a lane when laneId is an invalid path
+    //  handles removing a lane when requested lane is not found in the board.
+    //
 
     //
     // Todo
@@ -366,6 +370,46 @@ describe("update board data to markdown", () => {
             { name: "Existing lane" }, 
             { name: "New lane" },
         ]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
+    });
+
+    it("can remove only lane from a markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([  { name: "Existing lane" } ]);
+
+        removeLane(["children", 0], testMarkdownAst);
+        
+        const expectedResultingMarkdownAst = makeTestData([]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
+    });
+
+    it("can remove first lane from a markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([  { name: "Lane1" }, { name: "Lane2"}, ]);
+
+        removeLane(["children", 0], testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ { name: "Lane2" } ]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
+    });
+
+    it("can remove last lane from a markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([  { name: "Lane1" }, { name: "Lane2"}, ]);
+
+        removeLane(["children", 2], testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ { name: "Lane1" } ]);
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
+    });
+
+    it("can remove middle lane from a markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([  { name: "Lane1" }, { name: "Lane2"}, { name: "Lane3" }, ]);
+
+        removeLane(["children", 2], testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ { name: "Lane1" },  { name: "Lane3" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
     });
 });

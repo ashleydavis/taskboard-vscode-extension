@@ -93,8 +93,8 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
 //
 // Edits the name of a lane in the Kanboard back into the markdown AST.
 //
-export function editLaneName(laneAstPath: AstPath, newLaneName: string, markdownAST: any): void {
-    const fullLaneAstPath = laneAstPath.concat(["children", 0]);
+export function editLaneName(laneId: AstPath, newLaneName: string, markdownAST: any): void {
+    const fullLaneAstPath = laneId.concat(["children", 0]);
     const laneTitleNode = R.path<any>(fullLaneAstPath, markdownAST);
 
     laneTitleNode.value = newLaneName;
@@ -122,4 +122,23 @@ export function addNewLane(newLaneName: string, markdownAST: any): void {
         "spread": false,
         "children": []
     });
+}
+
+//
+// Removes a lane from a markdown AST.
+//
+export function removeLane(laneId: AstPath, markdownAST: any): void {
+    const laneToRemove = R.path<any>(laneId, markdownAST);
+    if (!laneToRemove) {
+        return;
+    }
+
+
+
+    const laneIndex = R.findIndex(child => child === laneToRemove, markdownAST.children);
+    if (laneIndex === -1) {
+        return;
+    }
+
+    markdownAST.children = R.remove(laneIndex, 2, markdownAST.children);
 }
