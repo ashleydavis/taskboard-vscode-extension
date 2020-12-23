@@ -117,9 +117,6 @@ export function addNewLane(newLaneName: string, markdownAST: any): void {
 
     markdownAST.children.push({
         "type": "list",
-        "ordered": false,
-        "start": null,
-        "spread": false,
         "children": []
     });
 }
@@ -145,8 +142,8 @@ export function removeLane(laneId: AstPath, markdownAST: any): void {
 // Edits the name of a task in a markdown AST.
 //
 export function editTaskName(taskId: AstPath, newTaskName: string, markdownAST: any): void {
-    const fullTaskAstPath = taskId.concat(["children", 0]);
-    const taskTitleNode = R.path<any>(fullTaskAstPath, markdownAST);
+    const taskTitlePath = taskId.concat(["children", 0, "children", 0]);
+    const taskTitleNode = R.path<any>(taskTitlePath, markdownAST);
 
     taskTitleNode.value = newTaskName;
 }
@@ -168,8 +165,6 @@ export function addNewTask(laneId: AstPath, newTaskName: string, markdownAST: an
     const listNode = markdownAST.children[laneNodeIndex+1];
     listNode.children.push({
         "type": "listItem",
-        "spread": false,
-        "checked": false,
         "children": [
             {
                 "type": "paragraph",
@@ -181,5 +176,28 @@ export function addNewTask(laneId: AstPath, newTaskName: string, markdownAST: an
                 ]
             }
         ]
-});
+    });
+}
+
+//
+// Removes a task from a lane.
+//
+export function removeTask(taskId: AstPath, markdownAST: any): void {
+    const listId = R.dropLast(2, taskId);
+    const listNode = R.path<any>(listId, markdownAST);
+    if (!listNode) {
+        return;
+    }
+
+    const taskNode = R.path<any>(taskId, markdownAST);
+    if (!taskNode) {
+        return;
+    }
+
+    const taskIndex = R.findIndex(child => child === taskNode, listNode.children);
+    if (taskIndex === -1) {
+        return;
+    }
+
+    listNode.children = R.remove(taskIndex, 1, listNode.children);   
 }
