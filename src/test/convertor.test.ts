@@ -91,7 +91,6 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(1);
 
         const lane = boardData.lanes[0];
-        expect(lane.id).toEqual(columnName);
         expect(lane.title).toEqual(columnName);
     });
 
@@ -104,7 +103,6 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(1);
 
         const lane = boardData.lanes[0];
-        expect(lane.id).toEqual(columnName);
         expect(lane.title).toEqual(columnName);
     });
 
@@ -119,11 +117,9 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(2);
         
         const lane1 = boardData.lanes[0];
-        expect(lane1.id).toEqual(columnName1);
         expect(lane1.title).toEqual(columnName1);
 
         const lane2 = boardData.lanes[1];
-        expect(lane2.id).toEqual(columnName2);
         expect(lane2.title).toEqual(columnName2);
     });
 
@@ -146,7 +142,6 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(card.id).toEqual("Task");
         expect(card.title).toEqual("Task");
     });
 
@@ -169,7 +164,6 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(card.id).toEqual("AnotherTask");
         expect(card.title).toEqual("AnotherTask");
     });
 
@@ -195,11 +189,9 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(2);
 
         const card1 = lane.cards[0];
-        expect(card1.id).toEqual("Task1");
         expect(card1.title).toEqual("Task1");
 
         const card2 = lane.cards[1];
-        expect(card2.id).toEqual("Task2");
         expect(card2.title).toEqual("Task2");
     });
 
@@ -211,7 +203,7 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(1);
 
         const lane = boardData.lanes[0];
-        expect(lane.astPath).toEqual([ "children", 0 ]);
+        expect(lane.id).toEqual([ "children", 0 ]);
     });
 
     it("second loaded column has an AST path", () => {
@@ -229,7 +221,7 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(2);
 
         const lane = boardData.lanes[1];
-        expect(lane.astPath).toEqual([ "children", 2 ]);
+        expect(lane.id).toEqual([ "children", 2 ]);
     });
  
 
@@ -252,7 +244,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(card.astPath).toEqual([ "children", 1, "children", 0 ]);
+        expect(card.id).toEqual([ "children", 1, "children", 0 ]);
     });
 
     it("second loaded task has an AST path", () => {
@@ -277,7 +269,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(2);
 
         const card = lane.cards[1];
-        expect(card.astPath).toEqual([ "children", 1, "children", 1 ]);
+        expect(card.id).toEqual([ "children", 1, "children", 1 ]);
     });
 
     it("task from second column has an AST path", () => {
@@ -304,7 +296,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(card.astPath).toEqual([ "children", 3, "children", 0 ]);
+        expect(card.id).toEqual([ "children", 3, "children", 0 ]);
     });
 
 });
