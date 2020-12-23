@@ -133,12 +133,20 @@ export function removeLane(laneId: AstPath, markdownAST: any): void {
         return;
     }
 
-
-
     const laneIndex = R.findIndex(child => child === laneToRemove, markdownAST.children);
     if (laneIndex === -1) {
         return;
     }
 
     markdownAST.children = R.remove(laneIndex, 2, markdownAST.children);
+}
+
+//
+// Edits the name of a task in a markdown AST.
+//
+export function editTaskName(taskId: AstPath, newTaskName: string, markdownAST: any): void {
+    const fullTaskAstPath = taskId.concat(["children", 0]);
+    const taskTitleNode = R.path<any>(fullTaskAstPath, markdownAST);
+
+    taskTitleNode.value = newTaskName;
 }

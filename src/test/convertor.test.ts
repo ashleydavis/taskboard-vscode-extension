@@ -1,4 +1,4 @@
-import { addNewLane, AstPath, editLaneName, markdownAstToBoarddata, removeLane } from "../convertor";
+import { addNewLane, AstPath, editLaneName, editTaskName, markdownAstToBoarddata, removeLane } from "../convertor";
 
 //
 // Interfaces for creating test data.
@@ -312,29 +312,6 @@ describe("deserialize markdown to board data", () => {
         expect(card.astPath).toEqual([ "children", 3, "children", 0 ]);
     });
 
-    // 
-    // loading tasks
-    // 
-    //  write a test that checks that where there is no list it can be handled
-    //  write tests to check required children in the AST are missing
-    //  tests for other edge cases
-    // 
-    // editing tests
-    //
-    //  can change task title
-    //  can add task
-    //  can delete task
-    //  handles deleting a lane from an empty board
-    //  handles removing a lane when laneId is an invalid path
-    //  handles removing a lane when requested lane is not found in the board.
-    //
-
-    //
-    // Todo
-    //
-    // Put type defs on markdown AST.
-    //
-
 });
 
 describe("update board data to markdown", () => {
@@ -342,9 +319,8 @@ describe("update board data to markdown", () => {
     it("can update lane name in markdown AST", () => {
 
         const testMarkdownAst = makeTestData([ { name: "Old name" } ]);
-        const laneAstPath = [ "children", 0 ];
 
-        editLaneName(laneAstPath, "New name", testMarkdownAst);
+        editLaneName([ "children", 0 ], "New name", testMarkdownAst);
 
         const expectedResultingMarkdownAst = makeTestData([ { name: "New name" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
@@ -412,4 +388,53 @@ describe("update board data to markdown", () => {
         const expectedResultingMarkdownAst = makeTestData([ { name: "Lane1" },  { name: "Lane3" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
     });
+
+    it("can update task name in markdown AST", () => {
+
+        const testMarkdownAst = makeTestData([ 
+            { 
+                name: "Lane", 
+                tasks: [
+                    {
+                        name: "Old task name",
+                    },
+                ],
+            },
+        ]);
+        
+        const taskId = [ "children", 1, "children", 0, "children", 0 ];
+
+        editTaskName(taskId, "New task name", testMarkdownAst);
+
+        const expectedResultingMarkdownAst = makeTestData([ 
+            { 
+                name: "Lane", 
+                tasks: [
+                    {
+                        name: "New task name",
+                    },
+                ],
+            },
+        ]);
+
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
+    });
+
 });
+
+// 
+// loading tasks
+// 
+//  write a test that checks that where there is no list it can be handled
+//  write tests to check required children in the AST are missing
+//  tests for other edge cases
+// 
+// editing tests
+//
+//  can change task title
+//  can add task
+//  can delete task
+//  handles deleting a lane from an empty board
+//  handles removing a lane when laneId is an invalid path
+//  handles removing a lane when requested lane is not found in the board.
+//
