@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import "./styles.css";
 import InteractorFactory from './Interaction/InteractorFactory';
 import Board from 'react-trello';
@@ -43,7 +43,7 @@ function markdownToBoard(markdown) {
             //
             // This is a columns, convert it to a "lane" in the board.
             //
-            const lane = { 
+            const lane: any = { 
             };
             lane.title = lane.id = child.children[0].value
             lane.cards = [];
@@ -57,7 +57,7 @@ function markdownToBoard(markdown) {
                 //
                 // This is a task, convert it to a "card" in the board.
                 //
-                const task = {};
+                const task: any = {};
                 task.title = task.id = listItem.children[0].children[0].value
 
                 lane.cards.push(task);
@@ -120,7 +120,7 @@ function boardToMarkdown(boardData) {
     return markdown;
 }
 
-class Index extends React.Component {
+class Index extends React.Component<any, any> {
 
     constructor(props) {
         super(props);
@@ -155,7 +155,7 @@ class Index extends React.Component {
 
     render() {
         // Comment this out to use test data instead.
-        const data = this.state.data;
+        //const data = this.state.data;
 
         return <>
             {/* <div>File name: {this.state.documentDetails.fileName}</div>

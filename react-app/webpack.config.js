@@ -9,15 +9,14 @@ const htmlWebpackPlugin = new HtmlWebPackPlugin({
 const htmlWebpackInlineSourcePlugin = new HtmlWebpackInlineSourcePlugin();
 
 module.exports = {
+  devtool: 'inline-source-map',
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
-      },
+        {
+            test: /\.tsx?$/,
+            use: "ts-loader",
+            exclude: "/node_modules/"
+        },
       {
         test: /\.css$/,
         use: [
@@ -30,6 +29,9 @@ module.exports = {
         ]
       }
     ],
+  },
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ],
   },
   plugins: [htmlWebpackPlugin, htmlWebpackInlineSourcePlugin]
 };
