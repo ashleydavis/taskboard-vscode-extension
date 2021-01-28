@@ -43,6 +43,9 @@
     "vscode-test": "^1.0.0-next.0"
   },
   "dependencies": {
-    "ramda": "^0.27.1"
+    "ramda": "^0.27.1",
+    "remark-parse": "^9.0.0",
+    "remark-stringify": "^9.0.1",
+    "unified": "^9.2.0"
   }
 }

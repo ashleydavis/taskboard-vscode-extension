@@ -140,10 +140,10 @@ class Index extends React.Component<any, any> {
                 documentDetails: event,
             });
 
-            const markdown = event.text;
+            const boardData = event.boardData;
             this.setState({
-                data: markdownToBoard(markdown),
-            });
+                data: boardData,
+            })
         };
     }
 
@@ -155,7 +155,7 @@ class Index extends React.Component<any, any> {
 
     render() {
         // Comment this out to use test data instead.
-        //const data = this.state.data;
+        const data = this.state.data;
 
         return <>
             {/* <div>File name: {this.state.documentDetails.fileName}</div>

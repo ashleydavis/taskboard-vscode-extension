@@ -5,6 +5,17 @@ import * as path from 'path';
 let webViewPanel: vscode.WebviewPanel;
 let latestMarkdownEditor: vscode.TextEditor;
 
+import * as unified from "unified";
+import * as markdown from "remark-parse";
+import * as stringify from 'remark-stringify';
+import { markdownAstToBoarddata } from './convertor';
+
+// Converts from markdown to AST.
+const fromMarkdownProcessor = unified().use(markdown);
+
+// Converts from AST to markdown.
+const toMarkdownProcessor = unified().use(stringify);
+
 function startCommandHandler(context: vscode.ExtensionContext): void {
 
     const editor = vscode.window.activeTextEditor;
@@ -41,13 +52,13 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
 
     webViewPanel = panel;
 
-    vscode.window.onDidChangeActiveTextEditor(e => {
+    vscode.window.onDidChangeActiveTextEditor(editor => {
 
-        if (!e) {
+        if (!editor) {
             return;
         }
 
-        sendDocumentChangedMessage(e!, panel);
+        sendDocumentChangedMessage(editor!, panel);
     });
 
     if (editor) {
@@ -60,6 +71,9 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
 //
 function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.WebviewPanel): void {
     const document = editor.document;
+    if (!document) {
+        return;
+    }
 
     console.log("Current document in VS Code has changed:");
     console.log(document.languageId);
@@ -72,11 +86,24 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
 
     latestMarkdownEditor = editor;
 
+    const markdown = document.getText();
+
+    console.log("Markdown Text:");
+    console.log(markdown);
+
+    const markdownAST = fromMarkdownProcessor.parse(markdown);
+    console.log("Markdown AST");
+    console.log(JSON.stringify(markdownAST, null, 4));
+
+    const boardData = markdownAstToBoarddata(markdownAST);
+    console.log("Board data");
+    console.log(JSON.stringify(boardData, null, 4));
+
     panel.webview.postMessage({
         command: "document-changed",
         fileName: document.fileName,
         languageId: document.languageId,
-        text: document.getText(),
+        boardData: boardData,
     });
 }
 
