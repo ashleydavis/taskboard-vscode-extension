@@ -26,9 +26,6 @@
   "dependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-trello": "^2.2.9",
-    "remark-parse": "^8.0.3",
-    "remark-stringify": "^8.1.1",
-    "unified": "^9.2.0"
+    "react-trello": "^2.2.9"
   }
 }
