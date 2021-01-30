@@ -1,3 +1,4 @@
+import { lastIndexOf } from "ramda";
 import { addNewLane, addNewTask, AstPath, editLaneName, editTaskName, markdownAstToBoarddata, removeLane, removeTask } from "../convertor";
 
 //
@@ -82,6 +83,7 @@ describe("deserialize markdown to board data", () => {
         const boardData = markdownAstToBoarddata(emptyMarkdownAST);
         expect(boardData).toEqual({
             lanes: [],
+            pathMap: {},
         });
     });
 
@@ -206,7 +208,8 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(1);
 
         const lane = boardData.lanes[0];
-        expect(lane.id).toEqual([ "children", 0 ]);
+        expect(boardData.pathMap[lane.id]).toEqual([ "children", 0 ]);
+
     });
 
     it("second loaded column has an AST path", () => {
@@ -224,7 +227,7 @@ describe("deserialize markdown to board data", () => {
         expect(boardData.lanes.length).toEqual(2);
 
         const lane = boardData.lanes[1];
-        expect(lane.id).toEqual([ "children", 2 ]);
+        expect(boardData.pathMap[lane.id]).toEqual([ "children", 2 ]);
     });
  
 
@@ -247,7 +250,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(card.id).toEqual([ "children", 1, "children", 0 ]);
+        expect(boardData.pathMap[card.id]).toEqual([ "children", 1, "children", 0 ]);
     });
 
     it("second loaded task has an AST path", () => {
@@ -272,7 +275,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(2);
 
         const card = lane.cards[1];
-        expect(card.id).toEqual([ "children", 1, "children", 1 ]);
+        expect(boardData.pathMap[card.id]).toEqual([ "children", 1, "children", 1 ]);
     });
 
     it("task from second column has an AST path", () => {
@@ -299,7 +302,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(card.id).toEqual([ "children", 3, "children", 0 ]);
+        expect(boardData.pathMap[card.id]).toEqual([ "children", 3, "children", 0 ]);
     });
 
     it("ignores headings with depths that are not at level 3", () => {

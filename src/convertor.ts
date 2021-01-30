@@ -3,6 +3,7 @@
 // to identify a node in the AST for editing.
 //
 import * as R from "ramda";
+import { v4 } from "uuid";
 
 export type AstPath = (string | number)[];
 
@@ -12,13 +13,11 @@ export type AstPath = (string | number)[];
 export interface ICardData {
 
     //
-    // This is a path to the node for the task in the
-    // markdown AST.
+    // Unique id for hte card.
     //
-    // It allows for the AST to be edited and serialized
-    // without losing data.
+    // This is mapped to an AST path through the path map to location the node in the AST for the card.
     //
-    id: AstPath;
+    id: string;
 
     title: string;
 }
@@ -29,13 +28,11 @@ export interface ICardData {
 export interface ILaneData {
 
     //
-    // This is a path to the node for the column in the
-    // markdown AST.
+    // Unique id for the lane.
     //
-    // It allows for the AST to be edited and serialized
-    // without losing data.
+    // This is mapped to an AST path through the path map to location the node in the AST for the lane.
     //
-    id: AstPath;
+    id: string;
 
     title: string;
 
@@ -43,12 +40,26 @@ export interface ILaneData {
 }
 
 //
+// Maps unique ids to ast paths.
+//
+export interface IPathMap {
+    [id: string]: AstPath;
+}
+
+//
 // Represents a Kanban board.
 //
 export interface IBoardData {
 
+    //
+    // Data for each lane in the board.
+    //
     lanes: ILaneData[];
 
+    //
+    // Maps unique ids to ast paths.
+    //
+    pathMap: IPathMap;
 }
 
 //
@@ -58,16 +69,19 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
 
     const boardData: IBoardData = {
         lanes: [],
+        pathMap: {},
     };
 
     for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 1) {
         const columnNode = markdownAST.children[childIndex];
         if (columnNode.type === "heading" && columnNode.depth === 3) {
+            const laneId = v4();
             const lane: ILaneData = {
-                id: [ "children", childIndex ],
+                id: laneId,
                 title: columnNode.children[0].value,
                 cards: [],
             };
+            boardData.pathMap[laneId] = [ "children", childIndex ];
             boardData.lanes.push(lane);
     
             const listChildIndex = childIndex + 1;
@@ -75,10 +89,12 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
             for (let listItemIndex = 0; listItemIndex < listRoot.children.length; ++listItemIndex) {
                 const listItem = listRoot.children[listItemIndex];
                 const taskText = listItem.children[0].children[0];
+                const cardId = v4();
                 lane.cards.push({
-                    id: [ "children", listChildIndex, "children", listItemIndex ],
+                    id: cardId,
                     title: taskText.value,
                 });
+                boardData.pathMap[cardId] = [ "children", listChildIndex, "children", listItemIndex ];
             }
     
             childIndex += 1;
