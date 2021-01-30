@@ -127,10 +127,9 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
 //
 // Edits the name of a lane in the Kanboard back into the markdown AST.
 //
-export function editLaneName(laneId: AstPath, newLaneName: string, board: IBoard): void {
-    const fullLaneAstPath = laneId.concat(["children", 0]);
+export function editLaneName(laneId: string, newLaneName: string, board: IBoard): void {
+    const fullLaneAstPath = board.pathMap[laneId].concat(["children", 0]);
     const laneTitleNode = R.path<any>(fullLaneAstPath, board.markdownAST);
-
     laneTitleNode.value = newLaneName;
 }
 
@@ -158,8 +157,8 @@ export function addNewLane(newLaneName: string, board: IBoard): void {
 //
 // Removes a lane from a markdown AST.
 //
-export function removeLane(laneId: AstPath, board: IBoard): void {
-    const laneToRemove = R.path<any>(laneId, board.markdownAST);
+export function removeLane(laneId: string, board: IBoard): void {
+    const laneToRemove = R.path<any>(board.pathMap[laneId], board.markdownAST);
     if (!laneToRemove) {
         return;
     }
@@ -175,8 +174,8 @@ export function removeLane(laneId: AstPath, board: IBoard): void {
 //
 // Edits the name of a task in a markdown AST.
 //
-export function editTaskName(taskId: AstPath, newTaskName: string, board: IBoard): void {
-    const taskTitlePath = taskId.concat(["children", 0, "children", 0]);
+export function editTaskName(taskId: string, newTaskName: string, board: IBoard): void {
+    const taskTitlePath = board.pathMap[taskId].concat(["children", 0, "children", 0]);
     const taskTitleNode = R.path<any>(taskTitlePath, board.markdownAST);
 
     taskTitleNode.value = newTaskName;
@@ -185,8 +184,8 @@ export function editTaskName(taskId: AstPath, newTaskName: string, board: IBoard
 //
 // Adds a new task to the lane.
 //
-export function addNewTask(laneId: AstPath, newTaskName: string, board: IBoard): void {
-    const laneNode = R.path<any>(laneId, board.markdownAST);
+export function addNewTask(laneId: string, newTaskName: string, board: IBoard): void {
+    const laneNode = R.path<any>(board.pathMap[laneId], board.markdownAST);
     if (!laneNode) {
         return;
     }
@@ -216,14 +215,15 @@ export function addNewTask(laneId: AstPath, newTaskName: string, board: IBoard):
 //
 // Removes a task from a lane.
 //
-export function removeTask(taskId: AstPath, board: IBoard): void {
-    const listId = R.dropLast(2, taskId);
-    const listNode = R.path<any>(listId, board.markdownAST);
+export function removeTask(taskId: string, board: IBoard): void {
+    const taskPath = board.pathMap[taskId];
+    const listPath = R.dropLast(2, taskPath);
+    const listNode = R.path<any>(listPath, board.markdownAST);
     if (!listNode) {
         return;
     }
 
-    const taskNode = R.path<any>(taskId, board.markdownAST);
+    const taskNode = R.path<any>(taskPath, board.markdownAST);
     if (!taskNode) {
         return;
     }
