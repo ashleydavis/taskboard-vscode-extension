@@ -14,6 +14,9 @@ interface ITestColumn {
     // The name of the column.
     name: string;
 
+    // The heading depth of the column in the markdown.
+    depth?: number;
+
     // Tasks in this column.
     tasks?: ITestTask[];
 }
@@ -28,7 +31,7 @@ function makeTestData(columns: ITestColumn[]): any {
         const columnName = column.name;
         children.push({
             "type": "heading",
-            "depth": 3,
+            "depth": column.depth || 3,
             "children": [
                 {
                     "type": "text",
@@ -297,6 +300,41 @@ describe("deserialize markdown to board data", () => {
 
         const card = lane.cards[0];
         expect(card.id).toEqual([ "children", 3, "children", 0 ]);
+    });
+
+    it("ignores headings with depths that are not at level 3", () => {
+        const testMarkdownAST = makeTestData([
+            {
+                name: "Column1",
+                depth: 1,
+                tasks: [
+                    {
+                        name: "Task",
+                    },
+                ],
+            },
+            {
+                name: "Column2",
+                depth: 2,
+                tasks: [
+                    {
+                        name: "Task",
+                    },
+                ],
+            },
+            {
+                name: "Column3",
+                depth: 4,
+                tasks: [
+                    {
+                        name: "Task",
+                    },
+                ],
+            },
+        ]);
+
+        const boardData = markdownAstToBoarddata(testMarkdownAST);
+        expect(boardData.lanes).toEqual([]);
     });
 
 });

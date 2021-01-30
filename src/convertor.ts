@@ -60,24 +60,28 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
         lanes: [],
     };
 
-    for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 2) {
+    for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 1) {
         const columnNode = markdownAST.children[childIndex];
-        const lane: ILaneData = {
-            id: [ "children", childIndex ],
-            title: columnNode.children[0].value,
-            cards: [],
-        };
-        boardData.lanes.push(lane);
-
-        const listChildIndex = childIndex + 1;
-        const listRoot = markdownAST.children[listChildIndex];
-        for (let listItemIndex = 0; listItemIndex < listRoot.children.length; ++listItemIndex) {
-            const listItem = listRoot.children[listItemIndex];
-            const taskText = listItem.children[0].children[0];
-            lane.cards.push({
-                id: [ "children", listChildIndex, "children", listItemIndex ],
-                title: taskText.value,
-            });
+        if (columnNode.type === "heading" && columnNode.depth === 3) {
+            const lane: ILaneData = {
+                id: [ "children", childIndex ],
+                title: columnNode.children[0].value,
+                cards: [],
+            };
+            boardData.lanes.push(lane);
+    
+            const listChildIndex = childIndex + 1;
+            const listRoot = markdownAST.children[listChildIndex];
+            for (let listItemIndex = 0; listItemIndex < listRoot.children.length; ++listItemIndex) {
+                const listItem = listRoot.children[listItemIndex];
+                const taskText = listItem.children[0].children[0];
+                lane.cards.push({
+                    id: [ "children", listChildIndex, "children", listItemIndex ],
+                    title: taskText.value,
+                });
+            }
+    
+            childIndex += 1;
         }
     }
 
