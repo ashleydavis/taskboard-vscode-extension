@@ -13,13 +13,22 @@ import { editLaneName, IBoardData, markdownAstToBoarddata } from './convertor';
 // Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
 
-// Converts from AST to markdown.
-const toMarkdownProcessor = unified().use(stringify);
+// Markdown options:
+// https://github.com/syntax-tree/mdast-util-to-markdown#formatting-options
+const markdownOptions: any = {
+    bullet: "-",
+    emphasis: "*",
+    fence: "`",
+    fences: true,
+    listItemIndent: "one",
+    entities: true,
+};
 
 //
 // The AST for the currently active markdown file.
 //
 let markdownAST: any;
+const toMarkdownProcessor = unified().use(stringify, markdownOptions);
 
 //
 // The converted board data for the currently active markdown. 
