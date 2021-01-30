@@ -127,9 +127,9 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
 //
 // Edits the name of a lane in the Kanboard back into the markdown AST.
 //
-export function editLaneName(laneId: AstPath, newLaneName: string, markdownAST: any): void {
+export function editLaneName(laneId: AstPath, newLaneName: string, board: IBoard): void {
     const fullLaneAstPath = laneId.concat(["children", 0]);
-    const laneTitleNode = R.path<any>(fullLaneAstPath, markdownAST);
+    const laneTitleNode = R.path<any>(fullLaneAstPath, board.markdownAST);
 
     laneTitleNode.value = newLaneName;
 }
@@ -137,8 +137,8 @@ export function editLaneName(laneId: AstPath, newLaneName: string, markdownAST: 
 //
 // Adds a new lane to markdown AST.
 //
-export function addNewLane(newLaneName: string, markdownAST: any): void {
-    markdownAST.children.push({
+export function addNewLane(newLaneName: string, board: IBoard): void {
+    board.markdownAST.children.push({
         "type": "heading",
         "depth": 3,
         "children": [
@@ -149,7 +149,7 @@ export function addNewLane(newLaneName: string, markdownAST: any): void {
         ],
     });
 
-    markdownAST.children.push({
+    board.markdownAST.children.push({
         "type": "list",
         "children": []
     });
@@ -158,26 +158,26 @@ export function addNewLane(newLaneName: string, markdownAST: any): void {
 //
 // Removes a lane from a markdown AST.
 //
-export function removeLane(laneId: AstPath, markdownAST: any): void {
-    const laneToRemove = R.path<any>(laneId, markdownAST);
+export function removeLane(laneId: AstPath, board: IBoard): void {
+    const laneToRemove = R.path<any>(laneId, board.markdownAST);
     if (!laneToRemove) {
         return;
     }
 
-    const laneIndex = R.findIndex(child => child === laneToRemove, markdownAST.children);
+    const laneIndex = R.findIndex(child => child === laneToRemove, board.markdownAST.children);
     if (laneIndex === -1) {
         return;
     }
 
-    markdownAST.children = R.remove(laneIndex, 2, markdownAST.children);
+    board.markdownAST.children = R.remove(laneIndex, 2, board.markdownAST.children);
 }
 
 //
 // Edits the name of a task in a markdown AST.
 //
-export function editTaskName(taskId: AstPath, newTaskName: string, markdownAST: any): void {
+export function editTaskName(taskId: AstPath, newTaskName: string, board: IBoard): void {
     const taskTitlePath = taskId.concat(["children", 0, "children", 0]);
-    const taskTitleNode = R.path<any>(taskTitlePath, markdownAST);
+    const taskTitleNode = R.path<any>(taskTitlePath, board.markdownAST);
 
     taskTitleNode.value = newTaskName;
 }
@@ -185,18 +185,18 @@ export function editTaskName(taskId: AstPath, newTaskName: string, markdownAST: 
 //
 // Adds a new task to the lane.
 //
-export function addNewTask(laneId: AstPath, newTaskName: string, markdownAST: any): void {
-    const laneNode = R.path<any>(laneId, markdownAST);
+export function addNewTask(laneId: AstPath, newTaskName: string, board: IBoard): void {
+    const laneNode = R.path<any>(laneId, board.markdownAST);
     if (!laneNode) {
         return;
     }
     
-    const laneNodeIndex =  R.findIndex(child => child === laneNode, markdownAST.children)
+    const laneNodeIndex =  R.findIndex(child => child === laneNode, board.markdownAST.children)
     if (laneNodeIndex === -1) {
         return;
     }
 
-    const listNode = markdownAST.children[laneNodeIndex+1];
+    const listNode = board.markdownAST.children[laneNodeIndex+1];
     listNode.children.push({
         "type": "listItem",
         "children": [
@@ -216,14 +216,14 @@ export function addNewTask(laneId: AstPath, newTaskName: string, markdownAST: an
 //
 // Removes a task from a lane.
 //
-export function removeTask(taskId: AstPath, markdownAST: any): void {
+export function removeTask(taskId: AstPath, board: IBoard): void {
     const listId = R.dropLast(2, taskId);
-    const listNode = R.path<any>(listId, markdownAST);
+    const listNode = R.path<any>(listId, board.markdownAST);
     if (!listNode) {
         return;
     }
 
-    const taskNode = R.path<any>(taskId, markdownAST);
+    const taskNode = R.path<any>(taskId, board.markdownAST);
     if (!taskNode) {
         return;
     }
