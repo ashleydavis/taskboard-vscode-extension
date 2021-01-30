@@ -80,9 +80,14 @@ describe("deserialize markdown to board data", () => {
         const emptyMarkdownAST = { 
             children: [],
         };
-        const boardData = markdownAstToBoarddata(emptyMarkdownAST);
-        expect(boardData).toEqual({
-            lanes: [],
+        const board = markdownAstToBoarddata(emptyMarkdownAST);
+        expect(board).toEqual({
+            boardData: {
+                lanes: [],
+            },
+            markdownAST: {
+                children: [],
+            },
             pathMap: {},
         });
     });
@@ -92,10 +97,10 @@ describe("deserialize markdown to board data", () => {
         const columnName = "Todo";
         const testMarkdownAST = makeTestData([ { name: columnName } ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(1);
 
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.title).toEqual(columnName);
     });
 
@@ -104,10 +109,10 @@ describe("deserialize markdown to board data", () => {
         const columnName = "Blah";
         const testMarkdownAST = makeTestData([ { name: columnName } ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(1);
 
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.title).toEqual(columnName);
     });
 
@@ -118,13 +123,13 @@ describe("deserialize markdown to board data", () => {
         const columns = [ { name: columnName1 }, { name: columnName2 } ];
         const testMarkdownAST = makeTestData(columns);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(2);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(2);
         
-        const lane1 = boardData.lanes[0];
+        const lane1 = board.boardData.lanes[0];
         expect(lane1.title).toEqual(columnName1);
 
-        const lane2 = boardData.lanes[1];
+        const lane2 = board.boardData.lanes[1];
         expect(lane2.title).toEqual(columnName2);
     });
 
@@ -140,10 +145,10 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toBe(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toBe(1);
         
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
@@ -162,10 +167,10 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toBe(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toBe(1);
         
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
@@ -187,10 +192,10 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toBe(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toBe(1);
 
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.cards.length).toEqual(2);
 
         const card1 = lane.cards[0];
@@ -204,11 +209,11 @@ describe("deserialize markdown to board data", () => {
 
         const testMarkdownAST = makeTestData([ { name: "Column" } ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(1);
 
-        const lane = boardData.lanes[0];
-        expect(boardData.pathMap[lane.id]).toEqual([ "children", 0 ]);
+        const lane = board.boardData.lanes[0];
+        expect(board.pathMap[lane.id]).toEqual([ "children", 0 ]);
 
     });
 
@@ -223,11 +228,11 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(2);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(2);
 
-        const lane = boardData.lanes[1];
-        expect(boardData.pathMap[lane.id]).toEqual([ "children", 2 ]);
+        const lane = board.boardData.lanes[1];
+        expect(board.pathMap[lane.id]).toEqual([ "children", 2 ]);
     });
  
 
@@ -243,14 +248,14 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(1);
 
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(boardData.pathMap[card.id]).toEqual([ "children", 1, "children", 0 ]);
+        expect(board.pathMap[card.id]).toEqual([ "children", 1, "children", 0 ]);
     });
 
     it("second loaded task has an AST path", () => {
@@ -268,14 +273,14 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(1);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(1);
 
-        const lane = boardData.lanes[0];
+        const lane = board.boardData.lanes[0];
         expect(lane.cards.length).toEqual(2);
 
         const card = lane.cards[1];
-        expect(boardData.pathMap[card.id]).toEqual([ "children", 1, "children", 1 ]);
+        expect(board.pathMap[card.id]).toEqual([ "children", 1, "children", 1 ]);
     });
 
     it("task from second column has an AST path", () => {
@@ -295,14 +300,14 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes.length).toEqual(2);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes.length).toEqual(2);
 
-        const lane = boardData.lanes[1];
+        const lane = board.boardData.lanes[1];
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(boardData.pathMap[card.id]).toEqual([ "children", 3, "children", 0 ]);
+        expect(board.pathMap[card.id]).toEqual([ "children", 3, "children", 0 ]);
     });
 
     it("ignores headings with depths that are not at level 3", () => {
@@ -336,8 +341,8 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const boardData = markdownAstToBoarddata(testMarkdownAST);
-        expect(boardData.lanes).toEqual([]);
+        const board = markdownAstToBoarddata(testMarkdownAST);
+        expect(board.boardData.lanes).toEqual([]);
     });
 
 });

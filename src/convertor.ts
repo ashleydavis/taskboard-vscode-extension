@@ -48,6 +48,7 @@ export interface IPathMap {
 
 //
 // Represents a Kanban board.
+// This is data that is passed to the webview and pluggined into React-trello.
 //
 export interface IBoardData {
 
@@ -55,6 +56,22 @@ export interface IBoardData {
     // Data for each lane in the board.
     //
     lanes: ILaneData[];
+}
+
+//
+// Represent the Kanban board and packages up the markdown AST and AST path map.
+//
+export interface IBoard {
+
+    //
+    // Converted data for the board.
+    //
+    boardData: IBoardData;
+
+    //
+    // Abstract syntax tree for the markdown the produced the board.
+    //
+    markdownAST: any;
 
     //
     // Maps unique ids to ast paths.
@@ -65,10 +82,13 @@ export interface IBoardData {
 //
 // Converts a markdown abstract syntax tree (AST) to Kanban board data.
 //
-export function markdownAstToBoarddata(markdownAST: any): IBoardData {
+export function markdownAstToBoarddata(markdownAST: any): IBoard {
 
-    const boardData: IBoardData = {
-        lanes: [],
+    const board: IBoard = {
+        boardData: {
+            lanes: [],
+        },
+        markdownAST: markdownAST,
         pathMap: {},
     };
 
@@ -81,8 +101,8 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
                 title: columnNode.children[0].value,
                 cards: [],
             };
-            boardData.pathMap[laneId] = [ "children", childIndex ];
-            boardData.lanes.push(lane);
+            board.pathMap[laneId] = [ "children", childIndex ];
+            board.boardData.lanes.push(lane);
     
             const listChildIndex = childIndex + 1;
             const listRoot = markdownAST.children[listChildIndex];
@@ -94,14 +114,14 @@ export function markdownAstToBoarddata(markdownAST: any): IBoardData {
                     id: cardId,
                     title: taskText.value,
                 });
-                boardData.pathMap[cardId] = [ "children", listChildIndex, "children", listItemIndex ];
+                board.pathMap[cardId] = [ "children", listChildIndex, "children", listItemIndex ];
             }
     
             childIndex += 1;
         }
     }
 
-    return boardData;   
+    return board;   
 }
 
 //
