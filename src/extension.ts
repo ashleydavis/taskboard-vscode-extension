@@ -132,23 +132,6 @@ function onPanelDidReceiveMessage(message: any) {
       runDirCommand((result : string) => webViewPanel.webview.postMessage({ command: 'getDirectoryInfo', directoryInfo: result }));
       return;
 
-    case "update-document": {
-        console.log(`Updating document with:`);
-        console.log(message.text);
-
-        if (latestMarkdownEditor) {
-            const document = latestMarkdownEditor.document;
-            const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
-            const fullRange = document.validateRange(invalidRange);
-            latestMarkdownEditor.edit(edit => edit.replace(fullRange, message.text));    
-        }
-        else {
-            console.error(`No latest editor.`);
-        }
-
-        return;
-    }
-
     case "send-edit": {
         console.log("send-edit");
         console.log(JSON.stringify(message, null, 4));
