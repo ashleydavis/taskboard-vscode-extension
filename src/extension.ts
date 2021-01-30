@@ -8,13 +8,23 @@ let latestMarkdownEditor: vscode.TextEditor;
 import * as unified from "unified";
 import * as markdown from "remark-parse";
 import * as stringify from 'remark-stringify';
-import { markdownAstToBoarddata } from './convertor';
+import { editLaneName, IBoardData, markdownAstToBoarddata } from './convertor';
 
 // Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
 
 // Converts from AST to markdown.
 const toMarkdownProcessor = unified().use(stringify);
+
+//
+// The AST for the currently active markdown file.
+//
+let markdownAST: any;
+
+//
+// The converted board data for the currently active markdown. 
+//
+let boardData: IBoardData | undefined;
 
 function startCommandHandler(context: vscode.ExtensionContext): void {
 
@@ -91,11 +101,11 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
     console.log("Markdown Text:");
     console.log(markdown);
 
-    const markdownAST = fromMarkdownProcessor.parse(markdown);
+    markdownAST = fromMarkdownProcessor.parse(markdown);
     console.log("Markdown AST");
     console.log(JSON.stringify(markdownAST, null, 4));
 
-    const boardData = markdownAstToBoarddata(markdownAST);
+    boardData = markdownAstToBoarddata(markdownAST);
     console.log("Board data");
     console.log(JSON.stringify(boardData, null, 4));
 
@@ -136,6 +146,26 @@ function onPanelDidReceiveMessage(message: any) {
             console.error(`No latest editor.`);
         }
 
+        return;
+    }
+
+    case "send-edit": {
+        console.log("send-edit");
+        console.log(JSON.stringify(message, null, 4));
+
+        const laneId = message.payload.laneId;
+        const title = message.payload.data.title;
+        editLaneName(laneId, title, markdownAST); // Updates the AST.
+
+        // console.log("Updated markdown AST:");
+        // console.log(JSON.stringify(markdownAST, null, 4));
+
+        const markdown = toMarkdownProcessor.stringify(markdownAST);    
+
+        const document = latestMarkdownEditor.document;
+        const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
+        const fullRange = document.validateRange(invalidRange);
+        latestMarkdownEditor.edit(edit => edit.replace(fullRange, markdown));    
         return;
     }
   }

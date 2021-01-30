@@ -45,7 +45,13 @@ function createFromVsCodeApi(vscode) {
             command: "update-document",
             text: text,
         });
+    };
 
+    Interactor.sendEdit = payload => {
+        vscode.postMessage({
+            command: "send-edit",
+            payload: payload,
+        });
     };
 
     return Interactor;

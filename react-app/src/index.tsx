@@ -170,24 +170,21 @@ class Index extends React.Component<any, any> {
                     editLaneTitle={true}
                     collapsibleLanes={true}
                     data={data} 
+                    onLaneUpdate={(laneId, data) => {
+                        console.log("onLaneUpdate");
+                        console.log("Lane id: " + laneId);
+                        console.log("Data: ")
+                        console.log(data);
+
+                        Interactor.sendEdit({
+                            laneId: laneId,
+                            data: data,
+                        });
+                    }}
                     onDataChange={newData => {
 
-                        //
-                        // Convert the updated board data back to markdown format.
-                        //
-                        const updatedMarkdownText = boardToMarkdown(newData);
-
-                        //
-                        // Prototype code (good for debugging):
-                        //
                         console.log("onDataChange");
-                        console.log(updatedMarkdownText);
-
-                        // 
-                        // Send the updated markdown file from the Webview back to the Extension 
-                        // to update the active document.
-                        //
-                        Interactor.updateDocument(updatedMarkdownText);
+                        console.log(newData);
                     }}
                     /> 
             }
