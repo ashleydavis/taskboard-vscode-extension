@@ -8,7 +8,7 @@ let latestMarkdownEditor: vscode.TextEditor;
 import * as unified from "unified";
 import * as markdown from "remark-parse";
 import * as stringify from 'remark-stringify';
-import { editLaneName, IBoardData, markdownAstToBoarddata } from './convertor';
+import { addNewLane, addNewTask, editLaneTitle, IBoard, markdownAstToBoarddata, removeLane, removeTask } from './convertor';
 
 // Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
@@ -24,16 +24,13 @@ const markdownOptions: any = {
     entities: true,
 };
 
-//
-// The AST for the currently active markdown file.
-//
-let markdownAST: any;
+// Converts from AST to markdown.
 const toMarkdownProcessor = unified().use(stringify, markdownOptions);
 
 //
-// The converted board data for the currently active markdown. 
+// The most recently converted Kanban board for the currently active markdown document.
 //
-let boardData: IBoardData | undefined;
+let currentBoard: IBoard | undefined;
 
 function startCommandHandler(context: vscode.ExtensionContext): void {
 
@@ -107,23 +104,33 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
 
     const markdown = document.getText();
 
-    console.log("Markdown Text:");
-    console.log(markdown);
+    // console.log("Markdown Text:");
+    // console.log(markdown);
 
-    markdownAST = fromMarkdownProcessor.parse(markdown);
-    console.log("Markdown AST");
-    console.log(JSON.stringify(markdownAST, null, 4));
+    const markdownAST = fromMarkdownProcessor.parse(markdown);
+    // console.log("Markdown AST");
+    // console.log("***");
+    // console.log(JSON.stringify(markdownAST, null, 4));
+    // console.log("***");
 
-    boardData = markdownAstToBoarddata(markdownAST);
-    console.log("Board data");
-    console.log(JSON.stringify(boardData, null, 4));
+    currentBoard = markdownAstToBoarddata(markdownAST);
+    // console.log("Board data");
+    // console.log(JSON.stringify(currentBoard, null, 4));
 
     panel.webview.postMessage({
         command: "document-changed",
         fileName: document.fileName,
         languageId: document.languageId,
-        boardData: boardData,
+        boardData: currentBoard.boardData,
     });
+
+    //
+    // Uncomment this to test serialization of markdown straight back to the document.
+    //
+    // const smarkdown = toMarkdownProcessor.stringify(markdownAST);
+    // const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
+    // const fullRange = document.validateRange(invalidRange);
+    // latestMarkdownEditor.edit(edit => edit.replace(fullRange, smarkdown ));    
 }
 
 function onPanelDispose(): void {
@@ -145,14 +152,54 @@ function onPanelDidReceiveMessage(message: any) {
         console.log("send-edit");
         console.log(JSON.stringify(message, null, 4));
 
-        const laneId = message.payload.laneId;
-        const title = message.payload.data.title;
-        editLaneName(laneId, title, markdownAST); // Updates the AST.
+        // console.log("@@ AST before:");
+        // console.log(JSON.stringify(currentBoard!.markdownAST, null, 4));
 
-        // console.log("Updated markdown AST:");
-        // console.log(JSON.stringify(markdownAST, null, 4));
+        switch (message.type) {
+            case "add-lane": {
+                addNewLane(message.id,  message.title, currentBoard!);
+                break;
+            }
 
-        const markdown = toMarkdownProcessor.stringify(markdownAST);    
+            case "delete-lane": {
+                removeLane(message.laneId, currentBoard!);
+                break;
+            }
+
+            case "edit-lane-title": {
+                editLaneTitle(message.laneId, message.title, currentBoard!);
+                break;
+            }
+
+            case "move-lane": {
+                //TODO:
+                break;
+            }
+
+            case "add-card": {
+                addNewTask(message.laneId, message.cardId, message.title, currentBoard!);
+                break;
+            }
+
+            case "delete-card": {
+                removeTask(message.laneId, message.cardId, currentBoard!);
+                break;
+            }
+
+            case "move-card": {
+                //TODO:
+                break;
+            }
+
+            default: {
+                throw new Error(`Unexpected edit type: ${message.type}`);
+            }
+        }
+
+        // console.log("@@ AST after:");
+        // console.log(JSON.stringify(currentBoard!.markdownAST, null, 4));
+
+        const markdown = toMarkdownProcessor.stringify(currentBoard!.markdownAST);    
 
         const document = latestMarkdownEditor.document;
         const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);

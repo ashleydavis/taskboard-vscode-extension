@@ -1,5 +1,4 @@
-import { lastIndexOf } from "ramda";
-import { addNewLane, addNewTask, AstPath, editLaneName, editTaskName, markdownAstToBoarddata, removeLane, removeTask } from "../convertor";
+import { addNewLane, addNewTask, editLaneTitle, editTaskName, markdownAstToBoarddata, removeLane, removeTask } from "../convertor";
 
 //
 // Interfaces for creating test data.
@@ -88,7 +87,8 @@ describe("deserialize markdown to board data", () => {
             markdownAST: {
                 children: [],
             },
-            pathMap: {},
+            laneMap: {},
+            cardMap: {},
         });
     });
 
@@ -205,7 +205,7 @@ describe("deserialize markdown to board data", () => {
         expect(card2.title).toEqual("Task2");
     });
 
-    it("first loaded column has an AST path", () => {
+    it("id is mapped for first loaded column", () => {
 
         const testMarkdownAST = makeTestData([ { name: "Column" } ]);
 
@@ -213,11 +213,13 @@ describe("deserialize markdown to board data", () => {
         expect(board.boardData.lanes.length).toEqual(1);
 
         const lane = board.boardData.lanes[0];
-        expect(board.pathMap[lane.id]).toEqual([ "children", 0 ]);
-
+        expect(board.laneMap[lane.id]).toEqual([
+            testMarkdownAST.children[0],
+            testMarkdownAST.children[1],
+        ]);
     });
 
-    it("second loaded column has an AST path", () => {
+    it("id is mapped for second loaded column", () => {
 
         const testMarkdownAST = makeTestData([ 
             { 
@@ -232,11 +234,14 @@ describe("deserialize markdown to board data", () => {
         expect(board.boardData.lanes.length).toEqual(2);
 
         const lane = board.boardData.lanes[1];
-        expect(board.pathMap[lane.id]).toEqual([ "children", 2 ]);
+        expect(board.laneMap[lane.id]).toEqual([
+            testMarkdownAST.children[2],
+            testMarkdownAST.children[3],
+        ]);
     });
  
 
-    it("first loaded task has an AST path", () => {
+    it("is is mapped for first loaded task", () => {
         const testMarkdownAST = makeTestData([
             {
                 name: "Todo",
@@ -255,7 +260,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(board.pathMap[card.id]).toEqual([ "children", 1, "children", 0 ]);
+        expect(board.cardMap[card.id]).toEqual(testMarkdownAST.children[1].children[0]);
     });
 
     it("second loaded task has an AST path", () => {
@@ -280,10 +285,10 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(2);
 
         const card = lane.cards[1];
-        expect(board.pathMap[card.id]).toEqual([ "children", 1, "children", 1 ]);
+        expect(board.cardMap[card.id]).toEqual(testMarkdownAST.children[1].children[1]);
     });
 
-    it("task from second column has an AST path", () => {
+    it("id is mapped for task from second column", () => {
         const testMarkdownAST = makeTestData([
             {
                 name: "Column1",
@@ -307,7 +312,7 @@ describe("deserialize markdown to board data", () => {
         expect(lane.cards.length).toEqual(1);
 
         const card = lane.cards[0];
-        expect(board.pathMap[card.id]).toEqual([ "children", 3, "children", 0 ]);
+        expect(board.cardMap[card.id]).toEqual(testMarkdownAST.children[3].children[0]);
     });
 
     it("ignores headings with depths that are not at level 3", () => {
@@ -352,13 +357,15 @@ describe("update board data to markdown AST", () => {
     it("can update lane name in markdown AST", () => {
 
         const testMarkdownAst = makeTestData([ { name: "Old name" } ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": [ "children", 0 ],
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
             },
         };
-        editLaneName("id-1", "New name", board);
+        editLaneTitle("lane-1", "New name", board);
 
         const expectedResultingMarkdownAst = makeTestData([ { name: "New name" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
@@ -367,8 +374,12 @@ describe("update board data to markdown AST", () => {
     it("can add new lane to empty markdown AST", () => {
 
         const testMarkdownAst = makeTestData([]);
-        const board: any = { markdownAST: testMarkdownAst };
-        addNewLane("New lane", board);
+        const board: any = { 
+            markdownAST: testMarkdownAst,
+            laneMap: {
+            },
+        };
+        addNewLane("1", "New lane", board);
 
         const expectedResultingMarkdownAst = makeTestData([ { name: "New lane" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
@@ -377,8 +388,12 @@ describe("update board data to markdown AST", () => {
     it("can add new lane to existing markdown AST", () => {
 
         const testMarkdownAst = makeTestData([ { name: "Existing lane" } ]);
-        const board: any = { markdownAST: testMarkdownAst };
-        addNewLane("New lane", board);
+        const board: any = { 
+            markdownAST: testMarkdownAst,
+            laneMap: {
+            },
+        };
+        addNewLane("1", "New lane", board);
 
         const expectedResultingMarkdownAst = makeTestData([ 
             { name: "Existing lane" }, 
@@ -390,13 +405,15 @@ describe("update board data to markdown AST", () => {
     it("can remove only lane from a markdown AST", () => {
 
         const testMarkdownAst = makeTestData([  { name: "Existing lane" } ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": ["children", 0],
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
             },
         };
-        removeLane("id-1", board);
+        removeLane("lane-1", board);
         
         const expectedResultingMarkdownAst = makeTestData([]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
@@ -405,13 +422,15 @@ describe("update board data to markdown AST", () => {
     it("can remove first lane from a markdown AST", () => {
 
         const testMarkdownAst = makeTestData([  { name: "Lane1" }, { name: "Lane2"}, ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": ["children", 0],
-            }
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
+            },
         };
-        removeLane("id-1", board);
+        removeLane("lane-1", board);
 
         const expectedResultingMarkdownAst = makeTestData([ { name: "Lane2" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
@@ -420,13 +439,15 @@ describe("update board data to markdown AST", () => {
     it("can remove last lane from a markdown AST", () => {
 
         const testMarkdownAst = makeTestData([  { name: "Lane1" }, { name: "Lane2"}, ]);
+        const laneHeadingNode = testMarkdownAst.children[2];
+        const laneChildrenNode = testMarkdownAst.children[3];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": ["children", 2],
-            }
+            laneMap: {
+                "lane-2": [laneHeadingNode, laneChildrenNode],
+            },
         };
-        removeLane("id-1", board);
+        removeLane("lane-2", board);
 
         const expectedResultingMarkdownAst = makeTestData([ { name: "Lane1" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
@@ -435,13 +456,15 @@ describe("update board data to markdown AST", () => {
     it("can remove middle lane from a markdown AST", () => {
 
         const testMarkdownAst = makeTestData([  { name: "Lane1" }, { name: "Lane2"}, { name: "Lane3" }, ]);
+        const laneHeadingNode = testMarkdownAst.children[2];
+        const laneChildrenNode = testMarkdownAst.children[3];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": ["children", 2],
-            }
+            laneMap: {
+                "lane-2": [laneHeadingNode, laneChildrenNode],
+            },
         };
-        removeLane("id-1", board);
+        removeLane("lane-2", board);
 
         const expectedResultingMarkdownAst = makeTestData([ { name: "Lane1" },  { name: "Lane3" } ]);
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
@@ -459,13 +482,19 @@ describe("update board data to markdown AST", () => {
                 ],
             },
         ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
+        const taskNode = laneChildrenNode.children[0];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": [ "children", 1, "children", 0 ],
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
+            },
+            cardMap: {
+                "card-1": taskNode,
             }
         };
-        editTaskName("id-1", "New task name", board);
+        editTaskName("card-1", "New task name", board);
 
         const expectedResultingMarkdownAst = makeTestData([ 
             { 
@@ -490,13 +519,17 @@ describe("update board data to markdown AST", () => {
                 ],
             },
         ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": [ "children", 0 ],
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
+            },
+            cardMap: {
             },
         };
-        addNewTask("id-1", "New task name", board);
+        addNewTask("lane-1", "card-1", "New task name", board);
 
         const expectedResultingMarkdownAst = makeTestData([ 
             { 
@@ -524,13 +557,17 @@ describe("update board data to markdown AST", () => {
                 ],
             },
         ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": [ "children", 0 ],
-            }
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
+            },
+            cardMap: {
+            },
         };
-        addNewTask("id-1", "Task2", board);
+        addNewTask("lane-1", "card-1", "Task2", board);
 
         const expectedResultingMarkdownAst = makeTestData([ 
             { 
@@ -546,7 +583,7 @@ describe("update board data to markdown AST", () => {
             },
         ]);
 
-        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
     });
 
     it("can remove a task from a lane in markdown AST", () => {
@@ -561,13 +598,19 @@ describe("update board data to markdown AST", () => {
                 ],
             },
         ]);
+        const laneHeadingNode = testMarkdownAst.children[0];
+        const laneChildrenNode = testMarkdownAst.children[1];
+        const taskNode = laneChildrenNode.children[0];
         const board: any = { 
             markdownAST: testMarkdownAst,
-            pathMap: {
-                "id-1": [ "children", 1, "children", 0 ],
+            laneMap: {
+                "lane-1": [laneHeadingNode, laneChildrenNode],
+            },
+            cardMap: {
+                "card-1": taskNode,
             }
         };
-        removeTask("id-1", board);
+        removeTask("lane-1", "card-1", board);
 
         const expectedResultingMarkdownAst = makeTestData([ 
             { 
@@ -575,8 +618,7 @@ describe("update board data to markdown AST", () => {
                 tasks: [],
             },
         ]);
-
-        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst)
+        expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
     });    
 });
 

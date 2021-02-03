@@ -2,10 +2,7 @@
 // Represents a path into the markdown AST that can be used
 // to identify a node in the AST for editing.
 //
-import * as R from "ramda";
 import { v4 } from "uuid";
-
-export type AstPath = (string | number)[];
 
 //
 // Represents a single card/task in the Kanban board.
@@ -13,7 +10,7 @@ export type AstPath = (string | number)[];
 export interface ICardData {
 
     //
-    // Unique id for hte card.
+    // Unique id for the card.
     //
     // This is mapped to an AST path through the path map to location the node in the AST for the card.
     //
@@ -40,10 +37,17 @@ export interface ILaneData {
 }
 
 //
-// Maps unique ids to ast paths.
+// Maps unique ids to cards.
 //
-export interface IPathMap {
-    [id: string]: AstPath;
+export interface ICardMap {
+    [id: string]: any; // Just a ref to the the markdown AST node for the card.
+}
+
+//
+// Maps unique ids to lanes.
+//
+export interface ILaneMap {
+    [id: string]: [any, any]; // A ref to the two markdown AST nodes for the lane.
 }
 
 //
@@ -74,9 +78,14 @@ export interface IBoard {
     markdownAST: any;
 
     //
-    // Maps unique ids to ast paths.
+    // Maps unique ids to cards.
     //
-    pathMap: IPathMap;
+    cardMap: ICardMap;
+
+    //
+    // Maps unique ids to lanes.
+    //
+    laneMap: ILaneMap;
 }
 
 //
@@ -89,7 +98,8 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
             lanes: [],
         },
         markdownAST: markdownAST,
-        pathMap: {},
+        cardMap: {},
+        laneMap: {},
     };
 
     for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 1) {
@@ -101,22 +111,23 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
                 title: columnNode.children[0].value,
                 cards: [],
             };
-            board.pathMap[laneId] = [ "children", childIndex ];
             board.boardData.lanes.push(lane);
     
             const listChildIndex = childIndex + 1;
-            const listRoot = markdownAST.children[listChildIndex];
-            for (let listItemIndex = 0; listItemIndex < listRoot.children.length; ++listItemIndex) {
-                const listItem = listRoot.children[listItemIndex];
-                const taskText = listItem.children[0].children[0];
+            const listRootNode = markdownAST.children[listChildIndex];
+            for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
+                const listItemNode = listRootNode.children[listItemIndex];
+                const taskText = listItemNode.children[0].children[0];
                 const cardId = v4();
                 lane.cards.push({
                     id: cardId,
                     title: taskText.value,
                 });
-                board.pathMap[cardId] = [ "children", listChildIndex, "children", listItemIndex ];
+                board.cardMap[cardId] = listItemNode
             }
-    
+
+            board.laneMap[laneId] = [columnNode, listRootNode];
+
             childIndex += 1;
         }
     }
@@ -125,78 +136,64 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
 }
 
 //
-// Edits the name of a lane in the Kanboard back into the markdown AST.
+// Edits the title of a lane in the Kanboard back into the markdown AST.
 //
-export function editLaneName(laneId: string, newLaneName: string, board: IBoard): void {
-    const fullLaneAstPath = board.pathMap[laneId].concat(["children", 0]);
-    const laneTitleNode = R.path<any>(fullLaneAstPath, board.markdownAST);
-    laneTitleNode.value = newLaneName;
+export function editLaneTitle(laneId: string, newTitle: string, board: IBoard): void {
+    const laneNode = board.laneMap[laneId][0];
+    const laneTitleNode = laneNode.children[0];
+    laneTitleNode.value = newTitle;
 }
 
 //
 // Adds a new lane to markdown AST.
 //
-export function addNewLane(newLaneName: string, board: IBoard): void {
-    board.markdownAST.children.push({
+export function addNewLane(laneId: string, title: string, board: IBoard): void {
+    const laneHeadingNode = {
         "type": "heading",
         "depth": 3,
         "children": [
             {
                 "type": "text",
-                "value": newLaneName,
+                "value": title,
             },
         ],
-    });
+    };
+    board.markdownAST.children.push(laneHeadingNode); // Add lane title to AST.
 
-    board.markdownAST.children.push({
+    const laneChildrenNode = {
         "type": "list",
         "children": []
-    });
+    };
+    board.markdownAST.children.push(laneChildrenNode); // Add empty card list to the AST.
+
+    board.laneMap[laneId] = [laneHeadingNode, laneChildrenNode]; // Keep track of the new nodes for the new lane.
 }
 
 //
 // Removes a lane from a markdown AST.
 //
 export function removeLane(laneId: string, board: IBoard): void {
-    const laneToRemove = R.path<any>(board.pathMap[laneId], board.markdownAST);
-    if (!laneToRemove) {
-        return;
-    }
-
-    const laneIndex = R.findIndex(child => child === laneToRemove, board.markdownAST.children);
-    if (laneIndex === -1) {
-        return;
-    }
-
-    board.markdownAST.children = R.remove(laneIndex, 2, board.markdownAST.children);
+    const laneHeadingNode = board.laneMap[laneId][0];
+    const laneIndex = board.markdownAST.children.indexOf(laneHeadingNode);
+    board.markdownAST.children.splice(laneIndex, 2);
 }
 
 //
 // Edits the name of a task in a markdown AST.
 //
 export function editTaskName(taskId: string, newTaskName: string, board: IBoard): void {
-    const taskTitlePath = board.pathMap[taskId].concat(["children", 0, "children", 0]);
-    const taskTitleNode = R.path<any>(taskTitlePath, board.markdownAST);
-
+    
+    const taskNode = board.cardMap[taskId];
+    const taskTitleNode = taskNode.children[0].children[0];
     taskTitleNode.value = newTaskName;
 }
 
 //
 // Adds a new task to the lane.
 //
-export function addNewTask(laneId: string, newTaskName: string, board: IBoard): void {
-    const laneNode = R.path<any>(board.pathMap[laneId], board.markdownAST);
-    if (!laneNode) {
-        return;
-    }
-    
-    const laneNodeIndex =  R.findIndex(child => child === laneNode, board.markdownAST.children)
-    if (laneNodeIndex === -1) {
-        return;
-    }
-
-    const listNode = board.markdownAST.children[laneNodeIndex+1];
-    listNode.children.push({
+export function addNewTask(laneId: string, cardId: string, cardTitle: string, board: IBoard): void {
+    const laneChildrenNode = board.laneMap[laneId][1];
+    const newCardNode = {
         "type": "listItem",
         "children": [
             {
@@ -204,34 +201,23 @@ export function addNewTask(laneId: string, newTaskName: string, board: IBoard): 
                 "children": [
                     {
                         "type": "text",
-                        "value": newTaskName,
+                        "value": cardTitle,
                     }
                 ]
             }
         ]
-    });
+    };
+    laneChildrenNode.children.push(newCardNode); // Add node to AST.
+
+    board.cardMap[cardId] = newCardNode; // Track the new node.
 }
 
 //
 // Removes a task from a lane.
 //
-export function removeTask(taskId: string, board: IBoard): void {
-    const taskPath = board.pathMap[taskId];
-    const listPath = R.dropLast(2, taskPath);
-    const listNode = R.path<any>(listPath, board.markdownAST);
-    if (!listNode) {
-        return;
-    }
-
-    const taskNode = R.path<any>(taskPath, board.markdownAST);
-    if (!taskNode) {
-        return;
-    }
-
-    const taskIndex = R.findIndex(child => child === taskNode, listNode.children);
-    if (taskIndex === -1) {
-        return;
-    }
-
-    listNode.children = R.remove(taskIndex, 1, listNode.children);   
+export function removeTask(laneId: string, taskId: string, board: IBoard): void {
+    const laneChildrenNode = board.laneMap[laneId][1];
+    const taskNode = board.cardMap[taskId];
+    const taskIndex = laneChildrenNode.children.indexOf(taskNode);
+    laneChildrenNode.children.splice(taskIndex, 1);
 }

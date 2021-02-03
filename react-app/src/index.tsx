@@ -57,6 +57,22 @@ class Index extends React.Component<any, any> {
                     editLaneTitle={true}
                     collapsibleLanes={true}
                     data={data} 
+                    onLaneAdd={lane => {
+                        Interactor.sendEdit({
+                            type: "add-lane",
+                            id: lane.id,
+                            title: lane.title,
+                        });
+                    }}
+                    onLaneDelete={(laneId) => {
+                        console.log("onLaneDelete");
+                        console.log(laneId);
+                        
+                        Interactor.sendEdit({
+                            type: "delete-lane",
+                            laneId: laneId,
+                        });
+                    }}
                     onLaneUpdate={(laneId, data) => {
                         console.log("onLaneUpdate");
                         console.log("Lane id: " + laneId);
@@ -64,9 +80,64 @@ class Index extends React.Component<any, any> {
                         console.log(data);
 
                         Interactor.sendEdit({
+                            type: "edit-lane-title",
                             laneId: laneId,
+                            title: data.title,
+                        });
+                    }}
+                    handleLaneDragEnd={(removedIndex, addedIndex, payload) => {
+                        console.log("handleLaneDragEnd");
+                        console.log(removedIndex, addedIndex, payload);
+
+                        Interactor.sendEdit({
+                            type: "move-lane",
+                            laneId: payload.id,
+                            removedIndex: removedIndex,
+                            addedIndex: addedIndex,
+                        });
+                    }}
+                    onCardAdd={(card, laneId) => {
+                        console.log("onCardAdd");
+                        console.log(card);
+                        console.log(laneId);
+
+                        Interactor.sendEdit({
+                            type: "add-card",
+                            cardId: card.id,
+                            title: card.title,  
+                            laneId: laneId,
+                        });
+                    }}
+                    onCardDelete={(cardId, laneId) => {
+                        console.log("onCardDelete");
+                        console.log(cardId);
+                        console.log(laneId);
+
+                        Interactor.sendEdit({
+                            type: "delete-card",
+                            cardId: cardId,
+                            laneId: laneId,
+                        });
+
+                    }}
+                    handleDragEnd={(cardId, sourceLaneId, targetLaneId, position, cardDetails) => {
+                        console.log("handleDragEnd");
+                        console.log(cardId, sourceLaneId, targetLaneId, position, cardDetails);
+
+                        Interactor.sendEdit({
+                            type: "move-card",
+                            cardId: cardId,
+                            sourceLaneId: sourceLaneId,
+                            targetLaneId: targetLaneId,
+                            position: position,
                             data: data,
                         });
+                    }}
+                    onCardClick={(cardId, metadata, laneId) => {
+                        console.log("onCardClick");
+                        console.log(cardId, metadata, laneId);
+
+                        //TODO: Open modal to edit card like trello.
                     }}
                     onDataChange={newData => {
 
