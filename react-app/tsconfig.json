@@ -14,7 +14,8 @@
         ],
         "typeRoots": [
             "node_modules/@types"
-        ]
+        ],
+        "experimentalDecorators": true
     },
     "exclude": [
         "node_modules",

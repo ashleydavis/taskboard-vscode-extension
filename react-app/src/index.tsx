@@ -3,11 +3,18 @@ import * as ReactDOM from "react-dom";
 import "./styles.css";
 import InteractorFactory from './Interaction/InteractorFactory';
 import Board from 'react-trello';
+import { IVSCodeApi, IVSCodeApi_id } from "./VsCodeApi";
+import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 
 const data = require("./data.json"); //TODO: MOVE TEST DATA SO THAT IT SHOWS ONLY IN THE TEST VERSION OF THE REACT APP.
 
 const Interactor = InteractorFactory.create();
+
+@InjectableClass()
 class Index extends React.Component<any, any> {
+
+    @InjectProperty(IVSCodeApi_id)
+    vsCodeApi!: IVSCodeApi;
 
     constructor(props) {
         super(props);
@@ -32,6 +39,10 @@ class Index extends React.Component<any, any> {
                 data: boardData,
             })
         };
+    }
+
+    componentDidMount() {
+        this.vsCodeApi.printMessage();
     }
 
     updateFilesToDisplay() {
