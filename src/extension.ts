@@ -8,7 +8,7 @@ let latestMarkdownEditor: vscode.TextEditor;
 import * as unified from "unified";
 import * as markdown from "remark-parse";
 import * as stringify from 'remark-stringify';
-import { addNewLane, addNewTask, editLaneTitle, IBoard, markdownAstToBoarddata, removeLane, removeTask } from './convertor';
+import { Board, IBoard, markdownAstToBoarddata } from './convertor';
 
 // Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
@@ -157,17 +157,17 @@ function onPanelDidReceiveMessage(message: any) {
 
         switch (message.type) {
             case "add-lane": {
-                addNewLane(message.id,  message.title, currentBoard!);
+                currentBoard!.addNewLane(message.id,  message.title, );
                 break;
             }
 
             case "delete-lane": {
-                removeLane(message.laneId, currentBoard!);
+                currentBoard!.removeLane(message.laneId);
                 break;
             }
 
             case "edit-lane-title": {
-                editLaneTitle(message.laneId, message.title, currentBoard!);
+                currentBoard!.editLaneTitle(message.laneId, message.title);
                 break;
             }
 
@@ -177,12 +177,12 @@ function onPanelDidReceiveMessage(message: any) {
             }
 
             case "add-card": {
-                addNewTask(message.laneId, message.cardId, message.title, currentBoard!);
+                currentBoard!.addNewTask(message.laneId, message.cardId, message.title);
                 break;
             }
 
             case "delete-card": {
-                removeTask(message.laneId, message.cardId, currentBoard!);
+                currentBoard!.removeTask(message.laneId, message.cardId);
                 break;
             }
 

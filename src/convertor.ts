@@ -86,6 +86,153 @@ export interface IBoard {
     // Maps unique ids to lanes.
     //
     laneMap: ILaneMap;
+
+    //
+    // Edits the title of a lane in the Kanboard back into the markdown AST.
+    //
+    editLaneTitle(laneId: string, newTitle: string): void;
+
+    //
+    // Adds a new lane to markdown AST.
+    //
+    addNewLane(laneId: string, title: string): void;
+        
+    //
+    // Removes a lane from a markdown AST.
+    //
+    removeLane(laneId: string): void;
+
+    //
+    // Edits the name of a task in a markdown AST.
+    //
+    editTaskName(taskId: string, newTaskName: string): void;
+    
+    //
+    // Adds a new task to the lane.
+    //
+    addNewTask(laneId: string, cardId: string, cardTitle: string): void;
+
+    //
+    // Removes a task from a lane.
+    //
+    removeTask(laneId: string, taskId: string): void;
+}
+
+export class Board implements IBoard {
+
+    //
+    // Converted data for the board.
+    //
+    boardData: IBoardData = {
+        lanes: [],
+    };
+
+    //
+    // Abstract syntax tree for the markdown the produced the board.
+    //
+    markdownAST: any;
+
+    //
+    // Maps unique ids to cards.
+    //
+    cardMap: ICardMap = {};
+
+    //
+    // Maps unique ids to lanes.
+    //
+    laneMap: ILaneMap = {};
+
+    constructor(markdownAST: any) {
+        this.markdownAST = markdownAST;
+    }
+
+    //
+    // Edits the title of a lane in the Kanboard back into the markdown AST.
+    //
+    editLaneTitle(laneId: string, newTitle: string): void {
+        const laneNode = this.laneMap[laneId][0];
+        const laneTitleNode = laneNode.children[0];
+        laneTitleNode.value = newTitle;
+    }
+
+    //
+    // Adds a new lane to markdown AST.
+    //
+    addNewLane(laneId: string, title: string): void {
+        const laneHeadingNode = {
+            "type": "heading",
+            "depth": 3,
+            "children": [
+                {
+                    "type": "text",
+                    "value": title,
+                },
+            ],
+        };
+        this.markdownAST.children.push(laneHeadingNode); // Add lane title to AST.
+
+        const laneChildrenNode = {
+            "type": "list",
+            "children": []
+        };
+        this.markdownAST.children.push(laneChildrenNode); // Add empty card list to the AST.
+
+        this.laneMap[laneId] = [laneHeadingNode, laneChildrenNode]; // Keep track of the new nodes for the new lane.
+    }
+
+    //
+    // Removes a lane from a markdown AST.
+    //
+    removeLane(laneId: string): void {
+        const laneHeadingNode = this.laneMap[laneId][0];
+        const laneIndex = this.markdownAST.children.indexOf(laneHeadingNode);
+        this.markdownAST.children.splice(laneIndex, 2);
+    }
+
+    //
+    // Edits the name of a task in a markdown AST.
+    //
+    editTaskName(taskId: string, newTaskName: string): void {
+        
+        const taskNode = this.cardMap[taskId];
+        const taskTitleNode = taskNode.children[0].children[0];
+        taskTitleNode.value = newTaskName;
+    }
+
+    //
+    // Adds a new task to the lane.
+    //
+    addNewTask(laneId: string, cardId: string, cardTitle: string): void {
+        const laneChildrenNode = this.laneMap[laneId][1];
+        const newCardNode = {
+            "type": "listItem",
+            "children": [
+                {
+                    "type": "paragraph",
+                    "children": [
+                        {
+                            "type": "text",
+                            "value": cardTitle,
+                        }
+                    ]
+                }
+            ]
+        };
+        laneChildrenNode.children.push(newCardNode); // Add node to AST.
+
+        this.cardMap[cardId] = newCardNode; // Track the new node.
+    }
+
+    //
+    // Removes a task from a lane.
+    //
+    removeTask(laneId: string, taskId: string): void {
+        const laneChildrenNode = this.laneMap[laneId][1];
+        const taskNode = this.cardMap[taskId];
+        const taskIndex = laneChildrenNode.children.indexOf(taskNode);
+        laneChildrenNode.children.splice(taskIndex, 1);
+    }
+
 }
 
 //
@@ -93,14 +240,7 @@ export interface IBoard {
 //
 export function markdownAstToBoarddata(markdownAST: any): IBoard {
 
-    const board: IBoard = {
-        boardData: {
-            lanes: [],
-        },
-        markdownAST: markdownAST,
-        cardMap: {},
-        laneMap: {},
-    };
+    const board = new Board(markdownAST);
 
     for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 1) {
         const columnNode = markdownAST.children[childIndex];
@@ -133,91 +273,4 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
     }
 
     return board;   
-}
-
-//
-// Edits the title of a lane in the Kanboard back into the markdown AST.
-//
-export function editLaneTitle(laneId: string, newTitle: string, board: IBoard): void {
-    const laneNode = board.laneMap[laneId][0];
-    const laneTitleNode = laneNode.children[0];
-    laneTitleNode.value = newTitle;
-}
-
-//
-// Adds a new lane to markdown AST.
-//
-export function addNewLane(laneId: string, title: string, board: IBoard): void {
-    const laneHeadingNode = {
-        "type": "heading",
-        "depth": 3,
-        "children": [
-            {
-                "type": "text",
-                "value": title,
-            },
-        ],
-    };
-    board.markdownAST.children.push(laneHeadingNode); // Add lane title to AST.
-
-    const laneChildrenNode = {
-        "type": "list",
-        "children": []
-    };
-    board.markdownAST.children.push(laneChildrenNode); // Add empty card list to the AST.
-
-    board.laneMap[laneId] = [laneHeadingNode, laneChildrenNode]; // Keep track of the new nodes for the new lane.
-}
-
-//
-// Removes a lane from a markdown AST.
-//
-export function removeLane(laneId: string, board: IBoard): void {
-    const laneHeadingNode = board.laneMap[laneId][0];
-    const laneIndex = board.markdownAST.children.indexOf(laneHeadingNode);
-    board.markdownAST.children.splice(laneIndex, 2);
-}
-
-//
-// Edits the name of a task in a markdown AST.
-//
-export function editTaskName(taskId: string, newTaskName: string, board: IBoard): void {
-    
-    const taskNode = board.cardMap[taskId];
-    const taskTitleNode = taskNode.children[0].children[0];
-    taskTitleNode.value = newTaskName;
-}
-
-//
-// Adds a new task to the lane.
-//
-export function addNewTask(laneId: string, cardId: string, cardTitle: string, board: IBoard): void {
-    const laneChildrenNode = board.laneMap[laneId][1];
-    const newCardNode = {
-        "type": "listItem",
-        "children": [
-            {
-                "type": "paragraph",
-                "children": [
-                    {
-                        "type": "text",
-                        "value": cardTitle,
-                    }
-                ]
-            }
-        ]
-    };
-    laneChildrenNode.children.push(newCardNode); // Add node to AST.
-
-    board.cardMap[cardId] = newCardNode; // Track the new node.
-}
-
-//
-// Removes a task from a lane.
-//
-export function removeTask(laneId: string, taskId: string, board: IBoard): void {
-    const laneChildrenNode = board.laneMap[laneId][1];
-    const taskNode = board.cardMap[taskId];
-    const taskIndex = laneChildrenNode.children.indexOf(taskNode);
-    laneChildrenNode.children.splice(taskIndex, 1);
 }
