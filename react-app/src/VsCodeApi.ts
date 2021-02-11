@@ -12,7 +12,7 @@ export const IVSCodeApi_id = "IVSCodeApi";
 export class VSCodeApi implements IVSCodeApi {
 
     printMessage(): void {
-        alert("Hello world!");
+        // alert("Hello world!");
     }
 }
 
