@@ -1,14 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "./styles.css";
-import InteractorFactory from './Interaction/InteractorFactory';
 import Board from 'react-trello';
 import { IVSCodeApi, IVSCodeApi_id } from "./VsCodeApi";
 import { InjectableClass, InjectProperty } from "@codecapers/fusion";
 
 const data = require("./data.json"); //TODO: MOVE TEST DATA SO THAT IT SHOWS ONLY IN THE TEST VERSION OF THE REACT APP.
-
-const Interactor = InteractorFactory.create();
 
 @InjectableClass()
 class Index extends React.Component<any, any> {
@@ -27,28 +24,20 @@ class Index extends React.Component<any, any> {
                 text: "",
             }
         };
-
-        Interactor.documentChangedEvent = (event) => {
-            console.log("Document has changed! Updating details.");
-            this.setState({
-                documentDetails: event,
-            });
-
-            const boardData = event.boardData;
-            this.setState({
-                data: boardData,
-            })
-        };
     }
 
     componentDidMount() {
-        this.vsCodeApi.printMessage();
-    }
+        this.vsCodeApi.setDocumentChangedEvent(messsage => {
+            console.log("Document has changed! Updating details.");
+            this.setState({
+                documentDetails: messsage,
+            });
 
-    updateFilesToDisplay() {
-        Interactor.getDirectoryInfo(directoryInfo => {
-            this.setState({ directoryInfo: directoryInfo });
-        })
+            const boardData = messsage.boardData;
+            this.setState({
+                data: boardData,
+            })
+        });
     }
 
     render() {
@@ -69,7 +58,7 @@ class Index extends React.Component<any, any> {
                     collapsibleLanes={true}
                     data={data} 
                     onLaneAdd={lane => {
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "add-lane",
                             id: lane.id,
                             title: lane.title,
@@ -79,7 +68,7 @@ class Index extends React.Component<any, any> {
                         console.log("onLaneDelete");
                         console.log(laneId);
                         
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "delete-lane",
                             laneId: laneId,
                         });
@@ -90,7 +79,7 @@ class Index extends React.Component<any, any> {
                         console.log("Data: ")
                         console.log(data);
 
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "edit-lane-title",
                             laneId: laneId,
                             title: data.title,
@@ -100,7 +89,7 @@ class Index extends React.Component<any, any> {
                         console.log("handleLaneDragEnd");
                         console.log(removedIndex, addedIndex, payload);
 
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "move-lane",
                             laneId: payload.id,
                             removedIndex: removedIndex,
@@ -112,7 +101,7 @@ class Index extends React.Component<any, any> {
                         console.log(card);
                         console.log(laneId);
 
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "add-card",
                             cardId: card.id,
                             title: card.title,  
@@ -124,7 +113,7 @@ class Index extends React.Component<any, any> {
                         console.log(cardId);
                         console.log(laneId);
 
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "delete-card",
                             cardId: cardId,
                             laneId: laneId,
@@ -135,7 +124,7 @@ class Index extends React.Component<any, any> {
                         console.log("handleDragEnd");
                         console.log(cardId, sourceLaneId, targetLaneId, position, cardDetails);
 
-                        Interactor.sendEdit({
+                        this.vsCodeApi.sendEdit({
                             type: "move-card",
                             cardId: cardId,
                             sourceLaneId: sourceLaneId,
