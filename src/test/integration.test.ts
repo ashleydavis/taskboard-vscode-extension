@@ -55,4 +55,13 @@ describe("integration", () => {
 
     });    
 
+    it("bad markdown 2", () => {
+
+        const testMarkdown = ``;
+        const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
+        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        console.log(JSON.stringify(board.boardData, null, 4)); 
+        
+    });    
+    
 });
