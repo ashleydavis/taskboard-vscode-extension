@@ -238,14 +238,14 @@ export class Board implements IBoard {
 //
 // Converts a markdown abstract syntax tree (AST) to Kanban board data.
 //
-export function markdownAstToBoarddata(markdownAST: any): IBoard {
+export function markdownAstToBoarddata(markdownAST: any, makeUuid?: () => string): IBoard {
 
     const board = new Board(markdownAST);
 
     for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 1) {
         const columnNode = markdownAST.children[childIndex];
         if (columnNode.type === "heading" && columnNode.depth === 3) {
-            const laneId = v4();
+            const laneId = makeUuid ? makeUuid() : v4();
             const lane: ILaneData = {
                 id: laneId,
                 title: columnNode.children[0].value,
@@ -258,7 +258,7 @@ export function markdownAstToBoarddata(markdownAST: any): IBoard {
             for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
                 const listItemNode = listRootNode.children[listItemIndex];
                 const taskText = listItemNode.children[0].children[0];
-                const cardId = v4();
+                const cardId = makeUuid ? makeUuid() : v4();
                 lane.cards.push({
                     id: cardId,
                     title: taskText.value,

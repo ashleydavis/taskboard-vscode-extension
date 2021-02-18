@@ -591,17 +591,3 @@ describe("update board data to markdown AST", () => {
         expect(testMarkdownAst).toEqual(expectedResultingMarkdownAst);
     });    
 });
-
-// 
-// loading tasks
-// 
-//  write a test that checks that where there is no list it can be handled
-//  write tests to check required children in the AST are missing
-//  tests for other edge cases
-// 
-// editing tests
-//
-//  handles deleting a lane from an empty board
-//  handles removing a lane when laneId is an invalid path
-//  handles removing a lane when requested lane is not found in the board.
-//
