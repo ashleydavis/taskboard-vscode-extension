@@ -41,6 +41,18 @@ describe("integration", () => {
                 }
             ]
         });
+    });  
+
+    it("bad markdown 1", () => {
+
+        const testMarkdown = `### Todo`;
+
+        const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
+        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        expect(board.boardData).toEqual({
+            "lanes": [],
+        });
+
     });    
 
 });

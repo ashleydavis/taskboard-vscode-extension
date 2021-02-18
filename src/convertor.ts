@@ -241,34 +241,37 @@ export class Board implements IBoard {
 export function markdownAstToBoarddata(markdownAST: any, makeUuid?: () => string): IBoard {
 
     const board = new Board(markdownAST);
+    const children = markdownAST.children;
 
-    for (let childIndex = 0; childIndex < markdownAST.children.length; childIndex += 1) {
-        const columnNode = markdownAST.children[childIndex];
+    for (let childIndex = 0; childIndex < children.length; childIndex += 1) {
+        const columnNode = children[childIndex];
         if (columnNode.type === "heading" && columnNode.depth === 3) {
-            const laneId = makeUuid ? makeUuid() : v4();
-            const lane: ILaneData = {
-                id: laneId,
-                title: columnNode.children[0].value,
-                cards: [],
-            };
-            board.boardData.lanes.push(lane);
+            const nextChildIndex = childIndex + 1;
+            if (nextChildIndex < children.length) {
+                const laneId = makeUuid ? makeUuid() : v4();
+                const lane: ILaneData = {
+                    id: laneId,
+                    title: columnNode.children[0].value,
+                    cards: [],
+                };
+                board.boardData.lanes.push(lane);
+        
+                const listRootNode = children[nextChildIndex];
+                for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
+                    const listItemNode = listRootNode.children[listItemIndex];
+                    const taskText = listItemNode.children[0].children[0];
+                    const cardId = makeUuid ? makeUuid() : v4();
+                    lane.cards.push({
+                        id: cardId,
+                        title: taskText.value,
+                    });
+                    board.cardMap[cardId] = listItemNode
+                }
     
-            const listChildIndex = childIndex + 1;
-            const listRootNode = markdownAST.children[listChildIndex];
-            for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
-                const listItemNode = listRootNode.children[listItemIndex];
-                const taskText = listItemNode.children[0].children[0];
-                const cardId = makeUuid ? makeUuid() : v4();
-                lane.cards.push({
-                    id: cardId,
-                    title: taskText.value,
-                });
-                board.cardMap[cardId] = listItemNode
+                board.laneMap[laneId] = [columnNode, listRootNode];
+    
+                childIndex += 1;
             }
-
-            board.laneMap[laneId] = [columnNode, listRootNode];
-
-            childIndex += 1;
         }
     }
 
