@@ -186,6 +186,18 @@ function onPanelDidReceiveMessage(message: any) {
                 break;
             }
 
+            case "edit-card-title": {
+                currentBoard!.editCardTitle(message.cardId, message.title);
+                break;
+            }
+
+            case "edit-card-description": {
+                //todo:
+                console.log("Edit card description...");
+                console.log(message);
+                break;
+            }
+
             case "move-card": {
                 //TODO:
                 break;

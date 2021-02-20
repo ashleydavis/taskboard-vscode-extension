@@ -120,6 +120,28 @@ class Index extends React.Component<any, any> {
                         });
 
                     }}
+                    onCardUpdate={(laneId, cardDetails) => { 
+                        console.log("onCardUpdate");
+                        console.log("Lane id: " + laneId);
+                        console.log("Card details: ")
+                        console.log(cardDetails);
+
+                        if (cardDetails.description) {
+                            this.vsCodeApi.sendEdit({
+                                type: "edit-card-description",
+                                cardId: cardDetails.id,
+                                description: cardDetails.description,
+                            });    
+                        }
+
+                        if (cardDetails.title) {
+                            this.vsCodeApi.sendEdit({
+                                type: "edit-card-title",
+                                cardId: cardDetails.id,
+                                title: cardDetails.title,
+                            });    
+                        }
+                    }}
                     handleDragEnd={(cardId, sourceLaneId, targetLaneId, position, cardDetails) => {
                         console.log("handleDragEnd");
                         console.log(cardId, sourceLaneId, targetLaneId, position, cardDetails);
@@ -132,12 +154,6 @@ class Index extends React.Component<any, any> {
                             position: position,
                             data: data,
                         });
-                    }}
-                    onCardClick={(cardId, metadata, laneId) => {
-                        console.log("onCardClick");
-                        console.log(cardId, metadata, laneId);
-
-                        //TODO: Open modal to edit card like trello.
                     }}
                     onDataChange={newData => {
 

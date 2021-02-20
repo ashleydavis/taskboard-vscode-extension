@@ -116,6 +116,11 @@ export interface IBoard {
     // Removes a task from a lane.
     //
     removeTask(laneId: string, taskId: string): void;
+
+    //
+    // Edits the title of a card.
+    //
+    editCardTitle(cardId: string, title: string): void;
 }
 
 export class Board implements IBoard {
@@ -233,6 +238,14 @@ export class Board implements IBoard {
         laneChildrenNode.children.splice(taskIndex, 1);
     }
 
+    //
+    // Edits the title of a card.
+    //
+    editCardTitle(cardId: string, newTitle: string): void {
+        const cardNode = this.cardMap[cardId];
+        const cardTitleNode = cardNode.children[0].children[0];
+        cardTitleNode.value = newTitle;
+    }
 }
 
 //

@@ -77,8 +77,6 @@ export class VSCodeApi implements IVSCodeApi {
     }   
 }
 
-// declare const acquireVsCodeApi: Function | undefined;
-
 if ((window as any).acquireVsCodeApi !== undefined) {
     //
     // If we can acquire the VSCode API, it means we are running under VSCode.
