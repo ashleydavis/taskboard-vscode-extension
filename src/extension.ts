@@ -8,7 +8,7 @@ let latestMarkdownEditor: vscode.TextEditor;
 import * as unified from "unified";
 import * as markdown from "remark-parse";
 import * as stringify from 'remark-stringify';
-import { Board, IBoard, parseKanbanBoard } from './convertor';
+import { IBoard, parseKanbanBoard } from './convertor';
 
 // Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
@@ -32,18 +32,15 @@ const toMarkdownProcessor = unified().use(stringify, markdownOptions);
 //
 let currentBoard: IBoard | undefined;
 
-function startCommandHandler(context: vscode.ExtensionContext): void {
+//
+// The command that opens the Kanban board view.
+//
+function openKanbanBoardView(context: vscode.ExtensionContext): void {
 
-    const editor = vscode.window.activeTextEditor;
-    const document = editor ? editor.document : undefined;
-    
-    console.log("Initial selected document:");
-    if (document) {
-        console.log(document.languageId);
-        console.log(document.fileName);
-    }
-    else {
-        console.log("No document");
+    if (webViewPanel) {
+        // Just activate the already open view.
+        webViewPanel.reveal();
+        return;
     }
 
     const showOptions = {
@@ -57,6 +54,14 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
         showOptions
     );
 
+    initKanbanBoardView(panel, context);
+}
+
+//
+// Initialises the webview panel that contains the Kanbanboard.
+///
+function initKanbanBoardView(panel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
+
     panel.webview.html = getHtmlForWebview();
     panel.webview.onDidReceiveMessage(
         onPanelDidReceiveMessage,
@@ -68,24 +73,14 @@ function startCommandHandler(context: vscode.ExtensionContext): void {
 
     webViewPanel = panel;
 
-    vscode.window.onDidChangeActiveTextEditor(editor => {
-
-        if (!editor) {
-            return;
-        }
-
-        sendDocumentChangedMessage(editor!, panel);
-    });
-
-    if (editor) {
-        sendDocumentChangedMessage(editor, panel);
-    }
+    sendDataToKanbanBoardView();
 }
 
 //
-// Send a message to the webview that the current document in Visual Studio Code has changed.
+// Tracks the current active editor in VSCode, if it's markdown sends the data to the Kanban board.
 //
-function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.WebviewPanel): void {
+function onActiveEditorChanged(editor: vscode.TextEditor): void {
+
     const document = editor.document;
     if (!document) {
         return;
@@ -102,6 +97,26 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
 
     latestMarkdownEditor = editor;
 
+    sendDataToKanbanBoardView();
+}
+
+//
+// Sends latest markdown data to the Kanban board.
+//
+function sendDataToKanbanBoardView() {
+    if (!webViewPanel) {
+        return;
+    }
+
+    if (!latestMarkdownEditor) {
+        return;
+    }
+
+    const document = latestMarkdownEditor.document;
+    if (!document) {
+        return;
+    }
+
     const markdown = document.getText();
 
     // console.log("Markdown Text:");
@@ -117,7 +132,7 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
     // console.log("Board data");
     // console.log(JSON.stringify(currentBoard, null, 4));
 
-    panel.webview.postMessage({
+    webViewPanel.webview.postMessage({
         command: "document-changed",
         fileName: document.fileName,
         languageId: document.languageId,
@@ -131,23 +146,18 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
     // const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
     // const fullRange = document.validateRange(invalidRange);
     // latestMarkdownEditor.edit(edit => edit.replace(fullRange, smarkdown ));    
+
 }
 
 function onPanelDispose(): void {
   // Clean up panel here
 }
 
+//
+// Receives a command from the webview.
+//
 function onPanelDidReceiveMessage(message: any) {
   switch (message.command) {
-
-    case 'showInformationMessage':
-      vscode.window.showInformationMessage(message.text);
-      return;
-
-    case 'getDirectoryInfo':
-      runDirCommand((result : string) => webViewPanel.webview.postMessage({ command: 'getDirectoryInfo', directoryInfo: result }));
-      return;
-
     case "send-edit": {
         console.log("send-edit");
         console.log(JSON.stringify(message, null, 4));
@@ -220,35 +230,58 @@ function onPanelDidReceiveMessage(message: any) {
   }
 }
 
-function runDirCommand(callback : Function) {
-  var spawn = require('child_process').spawn;
-  var cp = spawn(process.env.comspec, ['/c', 'dir']);
-  
-  cp.stdout.on("data", function(data : any) {
-    const dataString = data.toString();
-
-    callback(dataString);
-  });
-  
-  cp.stderr.on("data", function(data : any) {
-    // No op
-  });
-}
-
+//
+// Loads the HTML for the webview.
+//
 function getHtmlForWebview(): string {
-  try {
-    const reactApplicationHtmlFilename = 'index.html';
-    const htmlPath = path.join(__dirname, reactApplicationHtmlFilename);
-    const html = fs.readFileSync(htmlPath).toString();
+    try {
+        const reactApplicationHtmlFilename = 'index.html';
+        const htmlPath = path.join(__dirname, reactApplicationHtmlFilename);
+        const html = fs.readFileSync(htmlPath).toString();
 
-    return html;
-  }
-  catch (e) {
-    return `Error getting HTML for web view: ${e}`;
-  }
+        return html;
+    }
+    catch (e) {
+        return `Error getting HTML for web view: ${e}`;
+    }
 }
 
+//
+// Called when the extension is activated.
+//
 export function activate(context: vscode.ExtensionContext) {
-    const startCommand = vscode.commands.registerCommand('extension.startExtension', () => startCommandHandler(context));
+    const startCommand = vscode.commands.registerCommand('extension.startExtension', () => openKanbanBoardView(context));
     context.subscriptions.push(startCommand);
+
+    vscode.window.onDidChangeActiveTextEditor(editor => {
+        if (editor) {
+            onActiveEditorChanged(editor);
+        }
+    });
+
+    if (vscode.window.activeTextEditor) {
+        onActiveEditorChanged(vscode.window.activeTextEditor);
+    }
+
+    vscode.window.registerWebviewPanelSerializer('kanban-board-extension', new KanboardBoardSerializer(context));
+}
+
+//
+// Deserializes an already open webview.
+//
+class KanboardBoardSerializer implements vscode.WebviewPanelSerializer {
+    
+    private context: vscode.ExtensionContext;
+
+    constructor(context: vscode.ExtensionContext) {
+        this.context = context;
+    }
+
+    async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
+        //TODO: Do I need to restore state in the Kanban board view?
+        // `state` is the state persisted using `setState` inside the webview
+        // console.log(`Got state: ${state}`);
+    
+        initKanbanBoardView(webviewPanel, this.context);
+    }
 }

@@ -11,7 +11,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:extension.startExtension"
+    "onCommand:extension.startExtension",
+    "onWebviewPanel:kanban-board-extension"
   ],
   "main": "./out/extension.js",
   "contributes": {

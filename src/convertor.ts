@@ -337,7 +337,7 @@ function parseCard(listItemNode: any, makeUuid: (() => string) | undefined, lane
                 lane.cards.push(card);
                 board.cardMap[cardId] = listItemNode;
 
-                if (listItemNode.children.length > 1) {
+                if (listItemNode.children.length > 1) { //TODO: Be good to support a description composed of multiple list items.
                     const subListNode = listItemNode.children[1];
                     if (subListNode && 
                         subListNode.type === "list" && 
