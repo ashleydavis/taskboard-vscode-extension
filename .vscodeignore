@@ -9,3 +9,4 @@ vsc-extension-quickstart.md
 **/*.ts
 react-app/
 notebooks/
+webpack.config.js

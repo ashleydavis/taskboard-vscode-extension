@@ -34,8 +34,11 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "cd react-app && npm run build && cd .. && tsc -p ./ && copy react-app\\dist\\index.html out\\index.html",
+    "vscode:prepublish": "rm -rf ./out && npm run compile",
+    "compile": "cd react-app && npm run build && cd .. && webpack --mode production && copy react-app\\dist\\index.html out\\index.html",
+    "webpack": "webpack --mode development",
+    "webpack-dev": "webpack --mode development --watch",    
+    "test-compile": "tsc -p ./",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -49,10 +52,13 @@
     "glob": "^7.1.4",
     "jest": "^26.6.1",
     "ts-jest": "^26.4.3",
+    "ts-loader": "^8.0.17",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3",
     "vsce": "^1.85.0",
-    "vscode-test": "^1.0.0-next.0"
+    "vscode-test": "^1.0.0-next.0",
+    "webpack": "^5.23.0",
+    "webpack-cli": "^4.5.0"
   },
   "dependencies": {
     "remark-parse": "^9.0.0",
