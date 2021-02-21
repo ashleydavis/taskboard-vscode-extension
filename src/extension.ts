@@ -182,7 +182,7 @@ function onPanelDidReceiveMessage(message: any) {
             }
 
             case "move-lane": {
-                //TODO:
+                currentBoard!.moveLane(message.laneId, message.addedIndex);
                 break;
             }
 
@@ -207,7 +207,7 @@ function onPanelDidReceiveMessage(message: any) {
             }
 
             case "move-card": {
-                //TODO:
+                currentBoard!.moveCard(message.cardId, message.sourceLaneId, message.targetLaneId, message.position);
                 break;
             }
 

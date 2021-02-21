@@ -111,6 +111,11 @@ export interface IBoard {
     removeLane(laneId: string): void;
 
     //
+    // Moves a lane to a new position.
+    //
+    moveLane(laneId: string, position: number): void;
+
+    //
     // Edits the name of a task in a markdown AST.
     //
     editTaskName(taskId: string, newTaskName: string): void;
@@ -124,6 +129,11 @@ export interface IBoard {
     // Removes a task from a lane.
     //
     removeTask(laneId: string, taskId: string): void;
+
+    //
+    // Moves a card to a new position.
+    //
+    moveCard(cardId: string, sourceLaneId: string, targetLaneId: string, position: number): void;
 
     //
     // Edits the title of a card.
@@ -208,6 +218,46 @@ export class Board implements IBoard {
     }
 
     //
+    // Moves a lane to a new position.
+    //
+    moveLane(laneId: string, position: number): void {
+        const lane = this.laneMap[laneId];
+        for (let childIndex = 0; childIndex < this.markdownAST.children.length; ++childIndex) {
+            if (this.markdownAST.children[childIndex] === lane[0]) {
+                // Remove the lane from its current position.
+                this.markdownAST.children.splice(childIndex, 2);
+            }
+        }
+
+        //
+        // Count through "position" lanes to know where to reinsert the moved lane.
+        //
+        let numLanes = 0;
+        let childIndex;
+
+        for (childIndex = 0; childIndex < this.markdownAST.children.length; ++childIndex) {
+            const childNode = this.markdownAST.children[childIndex];
+            if (childNode.type === "heading" && childNode.depth === 3) {
+                const nextChildIndex = childIndex + 1;
+                if (nextChildIndex < this.markdownAST.children.length) {               
+                    const cardsListNode = this.markdownAST.children[nextChildIndex];
+                    if (cardsListNode && cardsListNode.type === "list") {            
+                        if (numLanes >= position) {
+                            break;
+                        }
+                        ++numLanes;
+                        ++childIndex;
+                        continue;
+                    }
+                }
+            }
+        }
+                    
+        // Add the lane to its new position.
+        this.markdownAST.children.splice(childIndex, 0, lane[0], lane[1]); // position*2 is because each lane is two nodes in the AST.
+    }
+
+    //
     // Edits the name of a task in a markdown AST.
     //
     editTaskName(taskId: string, newTaskName: string): void {
@@ -250,6 +300,26 @@ export class Board implements IBoard {
         const taskIndex = laneChildrenNode.children.indexOf(taskNode);
         laneChildrenNode.children.splice(taskIndex, 1);
     }
+    
+    //
+    // Moves a card to a new position.
+    //
+    moveCard(cardId: string, sourceLaneId: string, targetLaneId: string, position: number): void {
+        const sourceLane = this.laneMap[sourceLaneId];
+        const targetLane = this.laneMap[targetLaneId];
+        const cardNode = this.cardMap[cardId];
+        const sourceListNode = sourceLane[1];
+        for (let childIndex = 0; childIndex < sourceListNode.children.length; ++childIndex) {
+            if (sourceListNode.children[childIndex] === cardNode) {
+                // Remove the card from the source lane.
+                sourceListNode.children.splice(childIndex, 1);
+                break;
+            }
+        }
+
+        const targetListNode = targetLane[1];
+        targetListNode.children.splice(position, 0, cardNode);
+    }
 
     //
     // Edits the title of a card.
@@ -279,23 +349,23 @@ export function parseKanbanBoard(markdownAST: any, makeUuid?: () => string): IBo
     const children = markdownAST.children;
 
     for (let childIndex = 0; childIndex < children.length; childIndex += 1) {
-        const columnNode = children[childIndex];
-        if (columnNode.type === "heading" && columnNode.depth === 3) {
+        const laneNode = children[childIndex];
+        if (laneNode.type === "heading" && laneNode.depth === 3) {
             const nextChildIndex = childIndex + 1;
             if (nextChildIndex < children.length) {               
-                const listRootNode = children[nextChildIndex];
-                if (listRootNode && listRootNode.type === "list") {
+                const cardsListNode = children[nextChildIndex];
+                if (cardsListNode && cardsListNode.type === "list") {
                     const laneId = makeUuid ? makeUuid() : v4();
                     const lane: ILaneData = {
                         id: laneId,
-                        title: columnNode.children[0].value,
+                        title: laneNode.children[0].value,
                         cards: [],
                     };
                     board.boardData.lanes.push(lane);
                     
-                    parseCards(listRootNode, makeUuid, lane, board);
+                    parseCards(cardsListNode, makeUuid, lane, board);
 
-                    board.laneMap[laneId] = [columnNode, listRootNode];
+                    board.laneMap[laneId] = [laneNode, cardsListNode];
         
                     childIndex += 1;
                 }    
