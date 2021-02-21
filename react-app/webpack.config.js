@@ -10,6 +10,9 @@ const htmlWebpackInlineSourcePlugin = new HtmlWebpackInlineSourcePlugin();
 
 module.exports = (env, options) => {
     return {
+        performance: {
+            hints: false,
+        },        
         devtool: options.mode === "development" && "inline-source-map" || undefined, // Enable source maps in dev mode.
         module: {
             rules: [
