@@ -192,9 +192,7 @@ function onPanelDidReceiveMessage(message: any) {
             }
 
             case "edit-card-description": {
-                //todo:
-                console.log("Edit card description...");
-                console.log(message);
+                currentBoard!.editCardDescription(message.cardId, message.description);
                 break;
             }
 

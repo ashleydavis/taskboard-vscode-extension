@@ -129,6 +129,11 @@ export interface IBoard {
     // Edits the title of a card.
     //
     editCardTitle(cardId: string, title: string): void;
+
+    //
+    // Edits the description of a card.
+    //
+    editCardDescription(cardId: string, description: string): void;
 }
 
 export class Board implements IBoard {
@@ -253,6 +258,15 @@ export class Board implements IBoard {
         const cardNode = this.cardMap[cardId];
         const cardTitleNode = cardNode.children[0].children[0];
         cardTitleNode.value = newTitle;
+    }
+
+    //
+    // Edits the description of a card.
+    //
+    editCardDescription(cardId: string, newDescription: string): void {
+        const cardNode = this.cardMap[cardId];
+        const cardDescriptionNode = cardNode.children[1].children[0].children[0].children[0];
+        cardDescriptionNode.value = newDescription;
     }
 }
 
