@@ -8,30 +8,32 @@ const htmlWebpackPlugin = new HtmlWebPackPlugin({
 });
 const htmlWebpackInlineSourcePlugin = new HtmlWebpackInlineSourcePlugin();
 
-module.exports = {
-  devtool: 'inline-source-map',
-  module: {
-    rules: [
-        {
-            test: /\.tsx?$/,
-            use: "ts-loader",
-            exclude: "/node_modules/"
+module.exports = (env, options) => {
+    return {
+        devtool: options.mode === "development" && "inline-source-map" || undefined, // Enable source maps in dev mode.
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    use: "ts-loader",
+                    exclude: "/node_modules/"
+                },
+                {
+                    test: /\.css$/,
+                    use: [
+                        {
+                            loader: "style-loader"
+                        },
+                        {
+                            loader: "css-loader"
+                        }
+                    ]
+                }
+            ],
         },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: "style-loader"
-          },
-          {
-            loader: "css-loader"
-          }
-        ]
-      }
-    ],
-  },
-  resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ],
-  },
-  plugins: [htmlWebpackPlugin, htmlWebpackInlineSourcePlugin]
+        resolve: {
+          extensions: [ '.tsx', '.ts', '.js' ],
+        },
+        plugins: [htmlWebpackPlugin, htmlWebpackInlineSourcePlugin]
+    };
 };

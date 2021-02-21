@@ -6,11 +6,11 @@
   "scripts": {
     "start": "webpack --mode development",
     "build": "webpack --mode production",
-    "start:dev": "webpack-dev-server --open"
+    "start:dev": "webpack-dev-server --mode development --open"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/react": "^17.0.0",
     "css-loader": "^3.0.0",
