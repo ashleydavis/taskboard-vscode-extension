@@ -7,3 +7,5 @@ vsc-extension-quickstart.md
 **/tsconfig.json
 **/*.map
 **/*.ts
+react-app/
+notebooks/

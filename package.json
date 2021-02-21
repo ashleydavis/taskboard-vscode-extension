@@ -1,31 +1,41 @@
 {
-  "name": "kanban-board-extension",
-  "displayName": "Kanban board extension",
+  "name": "taskboard",
+  "displayName": "Taskboard",
   "publisher": "ashleydavis",
-  "description": "",
+  "description": "Edit your taskboard without leaving Visual Studio Code! (TODO.md format)",
   "version": "0.0.1",
+  "repository": "https://github.com/ashleydavis/taskboard-vscode-extension",
   "engines": {
     "vscode": "^1.36.0"
   },
+  "license": "MIT",
   "categories": [
     "Other"
   ],
+  "preview": true,
+  "keywords": [
+    "Kanban",
+    "Taskboard",
+    "productivity",
+    "organization",
+    "task management"
+  ],
   "activationEvents": [
     "onCommand:extension.startExtension",
-    "onWebviewPanel:kanban-board-extension"
+    "onWebviewPanel:taskboard-extension"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "extension.startExtension",
-        "title": "Open Kanban board"
+        "title": "Open Taskboard"
       }
     ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./ && copy react-app\\dist\\index.html out\\index.html",
+    "compile": "cd react-app && npm run build && cd .. && tsc -p ./ && copy react-app\\dist\\index.html out\\index.html",
     "test": "jest",
     "test:watch": "jest --watch"
   },
@@ -41,6 +51,7 @@
     "ts-jest": "^26.4.3",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3",
+    "vsce": "^1.85.0",
     "vscode-test": "^1.0.0-next.0"
   },
   "dependencies": {

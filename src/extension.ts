@@ -48,7 +48,7 @@ function openKanbanBoardView(context: vscode.ExtensionContext): void {
     };
 
     const panel = vscode.window.createWebviewPanel(
-        "kanban-board-extension",
+        "taskboard-extension",
         "Kanban board",
         vscode.ViewColumn.One,
         showOptions
@@ -274,7 +274,7 @@ export function activate(context: vscode.ExtensionContext) {
         onActiveEditorChanged(vscode.window.activeTextEditor);
     }
 
-    vscode.window.registerWebviewPanelSerializer('kanban-board-extension', new KanboardBoardSerializer(context));
+    vscode.window.registerWebviewPanelSerializer('taskboard-extension', new KanboardBoardSerializer(context));
 }
 
 //
