@@ -61,8 +61,31 @@ describe("integration", () => {
         const testMarkdown = ``;
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
         const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
-        console.log(JSON.stringify(board.boardData, null, 4)); 
-        
+        expect(board.boardData).toEqual({
+            "lanes": [],
+        });
     });    
+
+    it("bad markdown 3", () => {
+
+        const testMarkdown = dedent(
+            `### Todo
+
+            -`
+        );
+
+        const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
+        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        expect(board.boardData).toEqual( {
+            "lanes": [
+                {
+                    "id": "ABCD",
+                    "title": "Todo",
+                    "cards": []
+                }
+            ]
+        });
+    });      
+
     
 });

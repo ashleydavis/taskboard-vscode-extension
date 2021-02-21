@@ -272,13 +272,25 @@ export function markdownAstToBoarddata(markdownAST: any, makeUuid?: () => string
                 const listRootNode = children[nextChildIndex];
                 for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
                     const listItemNode = listRootNode.children[listItemIndex];
-                    const taskText = listItemNode.children[0].children[0];
-                    const cardId = makeUuid ? makeUuid() : v4();
-                    lane.cards.push({
-                        id: cardId,
-                        title: taskText.value,
-                    });
-                    board.cardMap[cardId] = listItemNode
+                    if (listItemNode.children && listItemNode.children.length > 0) {
+                        const paragraphNode = listItemNode.children[0];
+                        if (paragraphNode && paragraphNode.type === "paragraph") {
+                            if (paragraphNode.children && paragraphNode.children.length > 0) {
+                                const textNode = paragraphNode.children[0];
+                                if (textNode) {
+                                    // At minimum to create a card need a paragraph and some text for the title.
+                                    const taskText = listItemNode.children[0].children[0];
+                                    const cardId = makeUuid ? makeUuid() : v4();
+                                    lane.cards.push({
+                                        id: cardId,
+                                        title: textNode.value,
+                                    });
+                                    board.cardMap[cardId] = listItemNode
+                                }
+                            }
+
+                        }
+                    }
                 }
     
                 board.laneMap[laneId] = [columnNode, listRootNode];
