@@ -219,7 +219,10 @@ function onPanelDidReceiveMessage(message: any) {
         // console.log("@@ AST after:");
         // console.log(JSON.stringify(currentBoard!.markdownAST, null, 4));
 
-        const markdown = toMarkdownProcessor.stringify(currentBoard!.markdownAST);    
+        let markdown = toMarkdownProcessor.stringify(currentBoard!.markdownAST);    
+
+        // Remove escape characters for square brackets.
+        markdown = markdown.replace(/\\\[/g, "[");
 
         const document = latestMarkdownEditor.document;
         const invalidRange = new vscode.Range(0, 0, document.lineCount /*intentionally missing the '-1' */, 0);
