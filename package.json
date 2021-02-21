@@ -34,6 +34,7 @@
     "@types/node": "^10.17.44",
     "@types/uuid": "^8.3.0",
     "@types/vscode": "^1.36.0",
+    "dedent-js": "^1.0.1",
     "glob": "^7.1.4",
     "jest": "^26.6.1",
     "ts-jest": "^26.4.3",
