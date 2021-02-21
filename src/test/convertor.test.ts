@@ -1,4 +1,4 @@
-import { Board, markdownAstToBoarddata } from "../convertor";
+import { Board, parseKanbanBoard } from "../convertor";
 
 //
 // Interfaces for creating test data.
@@ -7,6 +7,9 @@ import { Board, markdownAstToBoarddata } from "../convertor";
 interface ITestTask {
     // The name of the task.
     name: string;
+
+    // The description of the task.
+    description?: string;
 }
 
 interface ITestColumn {
@@ -43,20 +46,45 @@ function makeTestData(columns: ITestColumn[]): any {
         const columnChildren: any[] = [];
         if (column.tasks) {
             for (const task of column.tasks) {
-                columnChildren.push({
+                const cardChildren: any[] = [
+                    {
+                        "type": "paragraph",
+                        "children": [
+                            {
+                                "type": "text",
+                                "value": task.name,
+                            }
+                        ]
+                    }
+                ];
+
+                if (task.description) {
+                    cardChildren.push({
+                        "type": "list",
+                        "children": [
+                            {
+                                "type": "listItem",
+                                "children": [
+                                    {
+                                        "type": "paragraph",
+                                        "children": [
+                                            {
+                                                "type": "text",
+                                                "value": task.description,
+                                            }
+                                        ],
+                                    }
+                                ],
+                            }
+                        ],
+                    });
+                }
+
+                const cardNode = {
                     "type": "listItem",
-                    "children": [
-                        {
-                            "type": "paragraph",
-                            "children": [
-                                {
-                                    "type": "text",
-                                    "value": task.name,
-                                }
-                            ]
-                        }
-                    ]
-                });
+                    "children": cardChildren,
+                };
+                columnChildren.push(cardNode);
             }
         }
 
@@ -79,7 +107,7 @@ describe("deserialize markdown to board data", () => {
         const emptyMarkdownAST = { 
             children: [],
         };
-        const board = markdownAstToBoarddata(emptyMarkdownAST);
+        const board = parseKanbanBoard(emptyMarkdownAST);
         expect(board).toEqual({
             boardData: {
                 lanes: [],
@@ -97,7 +125,7 @@ describe("deserialize markdown to board data", () => {
         const columnName = "Todo";
         const testMarkdownAST = makeTestData([ { name: columnName } ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(1);
 
         const lane = board.boardData.lanes[0];
@@ -109,7 +137,7 @@ describe("deserialize markdown to board data", () => {
         const columnName = "Blah";
         const testMarkdownAST = makeTestData([ { name: columnName } ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(1);
 
         const lane = board.boardData.lanes[0];
@@ -123,7 +151,7 @@ describe("deserialize markdown to board data", () => {
         const columns = [ { name: columnName1 }, { name: columnName2 } ];
         const testMarkdownAST = makeTestData(columns);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(2);
         
         const lane1 = board.boardData.lanes[0];
@@ -145,7 +173,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toBe(1);
         
         const lane = board.boardData.lanes[0];
@@ -167,7 +195,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toBe(1);
         
         const lane = board.boardData.lanes[0];
@@ -175,6 +203,30 @@ describe("deserialize markdown to board data", () => {
 
         const card = lane.cards[0];
         expect(card.title).toEqual("AnotherTask");
+    });
+
+    it("can load a task with a description", () => {
+        const testMarkdownAST = makeTestData([
+            {
+                name: "Todo",
+                tasks: [
+                    {
+                        name: "Task",
+                        description: "A great task",
+                    },
+                ],
+            },
+        ]);
+
+        const board = parseKanbanBoard(testMarkdownAST);
+
+        expect(board.boardData.lanes.length).toBe(1);
+        
+        const lane = board.boardData.lanes[0];
+        expect(lane.cards.length).toEqual(1);
+
+        const card = lane.cards[0];
+        expect(card.description).toEqual("A great task");
     });
 
     it("can load multiple tasks", () => {
@@ -192,7 +244,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toBe(1);
 
         const lane = board.boardData.lanes[0];
@@ -209,7 +261,7 @@ describe("deserialize markdown to board data", () => {
 
         const testMarkdownAST = makeTestData([ { name: "Column" } ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(1);
 
         const lane = board.boardData.lanes[0];
@@ -230,7 +282,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(2);
 
         const lane = board.boardData.lanes[1];
@@ -253,7 +305,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(1);
 
         const lane = board.boardData.lanes[0];
@@ -278,7 +330,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(1);
 
         const lane = board.boardData.lanes[0];
@@ -305,7 +357,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes.length).toEqual(2);
 
         const lane = board.boardData.lanes[1];
@@ -346,7 +398,7 @@ describe("deserialize markdown to board data", () => {
             },
         ]);
 
-        const board = markdownAstToBoarddata(testMarkdownAST);
+        const board = parseKanbanBoard(testMarkdownAST);
         expect(board.boardData.lanes).toEqual([]);
     });
 

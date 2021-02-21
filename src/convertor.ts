@@ -16,7 +16,15 @@ export interface ICardData {
     //
     id: string;
 
+    //
+    // The title for the card.
+    //
     title: string;
+
+    //
+    // The description for the card.
+    //
+    description?: string
 }
 
 //
@@ -251,7 +259,7 @@ export class Board implements IBoard {
 //
 // Converts a markdown abstract syntax tree (AST) to Kanban board data.
 //
-export function markdownAstToBoarddata(markdownAST: any, makeUuid?: () => string): IBoard {
+export function parseKanbanBoard(markdownAST: any, makeUuid?: () => string): IBoard {
 
     const board = new Board(markdownAST);
     const children = markdownAST.children;
@@ -260,45 +268,90 @@ export function markdownAstToBoarddata(markdownAST: any, makeUuid?: () => string
         const columnNode = children[childIndex];
         if (columnNode.type === "heading" && columnNode.depth === 3) {
             const nextChildIndex = childIndex + 1;
-            if (nextChildIndex < children.length) {
-                const laneId = makeUuid ? makeUuid() : v4();
-                const lane: ILaneData = {
-                    id: laneId,
-                    title: columnNode.children[0].value,
-                    cards: [],
-                };
-                board.boardData.lanes.push(lane);
-        
+            if (nextChildIndex < children.length) {               
                 const listRootNode = children[nextChildIndex];
-                for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
-                    const listItemNode = listRootNode.children[listItemIndex];
-                    if (listItemNode.children && listItemNode.children.length > 0) {
-                        const paragraphNode = listItemNode.children[0];
-                        if (paragraphNode && paragraphNode.type === "paragraph") {
-                            if (paragraphNode.children && paragraphNode.children.length > 0) {
-                                const textNode = paragraphNode.children[0];
-                                if (textNode) {
-                                    // At minimum to create a card need a paragraph and some text for the title.
-                                    const taskText = listItemNode.children[0].children[0];
-                                    const cardId = makeUuid ? makeUuid() : v4();
-                                    lane.cards.push({
-                                        id: cardId,
-                                        title: textNode.value,
-                                    });
-                                    board.cardMap[cardId] = listItemNode
-                                }
-                            }
+                if (listRootNode && listRootNode.type === "list") {
+                    const laneId = makeUuid ? makeUuid() : v4();
+                    const lane: ILaneData = {
+                        id: laneId,
+                        title: columnNode.children[0].value,
+                        cards: [],
+                    };
+                    board.boardData.lanes.push(lane);
+                    
+                    parseCards(listRootNode, makeUuid, lane, board);
 
-                        }
-                    }
-                }
-    
-                board.laneMap[laneId] = [columnNode, listRootNode];
-    
-                childIndex += 1;
+                    board.laneMap[laneId] = [columnNode, listRootNode];
+        
+                    childIndex += 1;
+                }    
             }
         }
     }
 
     return board;   
 }
+
+//
+// Parse cards from markdown AST to the Kanban board data format.
+//
+function parseCards(listRootNode: any, makeUuid: (() => string) | undefined, lane: ILaneData, board: Board) {
+
+    for (let listItemIndex = 0; listItemIndex < listRootNode.children.length; ++listItemIndex) {
+        const listItemNode = listRootNode.children[listItemIndex];
+        if (listItemNode.children && listItemNode.children.length > 0) {
+            parseCard(listItemNode, makeUuid, lane, board);
+        }
+    }
+}
+
+//
+// Parses a card from markdown AST to Kanboard board data format.
+//
+function parseCard(listItemNode: any, makeUuid: (() => string) | undefined, lane: ILaneData, board: Board) {
+    const paragraphNode = listItemNode.children[0];
+    if (paragraphNode && paragraphNode.type === "paragraph") {
+        if (paragraphNode.children && paragraphNode.children.length > 0) {
+            const textNode = paragraphNode.children[0];
+            if (textNode) {
+                // At minimum to create a card need a paragraph and some text for the title.
+                const cardId = makeUuid ? makeUuid() : v4();
+                const card: ICardData = {
+                    id: cardId,
+                    title: textNode.value,
+                };
+                lane.cards.push(card);
+                board.cardMap[cardId] = listItemNode;
+
+                if (listItemNode.children.length > 1) {
+                    const subListNode = listItemNode.children[1];
+                    if (subListNode && 
+                        subListNode.type === "list" && 
+                        subListNode.children && 
+                        subListNode.children.length > 0) {
+                        
+                        const subListItemNode = subListNode.children[0];
+                        if (subListItemNode && 
+                            subListItemNode.type === "listItem" &&
+                            subListItemNode.children &&
+                            subListItemNode.children.length > 0) {
+
+                            const descriptionParagraph = subListItemNode.children[0];
+                            if (descriptionParagraph && 
+                                descriptionParagraph.type === "paragraph" && 
+                                descriptionParagraph.children &&
+                                descriptionParagraph.children.length > 0) {
+                                
+                                const textNode = descriptionParagraph.children[0];
+                                if (textNode && textNode.type === "text" && textNode.value) {
+                                    card.description = textNode.value;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

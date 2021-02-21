@@ -8,7 +8,7 @@ let latestMarkdownEditor: vscode.TextEditor;
 import * as unified from "unified";
 import * as markdown from "remark-parse";
 import * as stringify from 'remark-stringify';
-import { Board, IBoard, markdownAstToBoarddata } from './convertor';
+import { Board, IBoard, parseKanbanBoard } from './convertor';
 
 // Converts from markdown to AST.
 const fromMarkdownProcessor = unified().use(markdown);
@@ -113,7 +113,7 @@ function sendDocumentChangedMessage(editor: vscode.TextEditor, panel: vscode.Web
     // console.log(JSON.stringify(markdownAST, null, 4));
     // console.log("***");
 
-    currentBoard = markdownAstToBoarddata(markdownAST);
+    currentBoard = parseKanbanBoard(markdownAST);
     // console.log("Board data");
     // console.log(JSON.stringify(currentBoard, null, 4));
 

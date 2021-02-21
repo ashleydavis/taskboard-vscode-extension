@@ -1,6 +1,6 @@
 import * as unified from "unified";
 import * as markdown from "remark-parse";
-import { markdownAstToBoarddata } from "../convertor";
+import { parseKanbanBoard } from "../convertor";
 import * as dedent from "dedent-js";
 
 // Converts from markdown to AST.
@@ -19,7 +19,7 @@ describe("integration", () => {
         );
 
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
-        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        const board = parseKanbanBoard(markdownAST, () => "ABCD");
         expect(board.boardData).toEqual({
             "lanes": [
                 {
@@ -49,7 +49,7 @@ describe("integration", () => {
         const testMarkdown = `### Todo`;
 
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
-        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        const board = parseKanbanBoard(markdownAST, () => "ABCD");
         expect(board.boardData).toEqual({
             "lanes": [],
         });
@@ -60,7 +60,7 @@ describe("integration", () => {
 
         const testMarkdown = ``;
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
-        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        const board = parseKanbanBoard(markdownAST, () => "ABCD");
         expect(board.boardData).toEqual({
             "lanes": [],
         });
@@ -75,7 +75,7 @@ describe("integration", () => {
         );
 
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
-        const board = markdownAstToBoarddata(markdownAST, () => "ABCD");
+        const board = parseKanbanBoard(markdownAST, () => "ABCD");
         expect(board.boardData).toEqual( {
             "lanes": [
                 {
