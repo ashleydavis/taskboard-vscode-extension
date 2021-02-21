@@ -262,6 +262,14 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    vscode.workspace.onDidChangeTextDocument(event => {
+        if (event.document === latestMarkdownEditor.document) {
+            // The document that changed is the one currently displayed in the Kanban board.
+            // Reset the Kanban board from the markdown file.
+            sendDataToKanbanBoardView();
+        }        
+    });
+
     if (vscode.window.activeTextEditor) {
         onActiveEditorChanged(vscode.window.activeTextEditor);
     }
