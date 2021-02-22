@@ -31,6 +31,12 @@ Follow the developer on Twitter for updates: [https://twitter.com/ashleydavis75]
 
 ### Package and install the extension
 
+List files that will be included in the package:
+
+```bash
+npx vsce ls
+```
+
 Create the package:
 
 ```bash
