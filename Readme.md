@@ -29,6 +29,20 @@ Follow the developer on Twitter for updates: [https://twitter.com/ashleydavis75]
 - Navigate to `/react-app`
 - `npm run start:dev`
 
+### Package and install the extension
+
+Create the package:
+
+```bash
+npx vsce package
+```
+
+Installed the package in VSCode:
+
+```bash
+code --install-extension taskboard-0.0.1.vsix
+```
+
 ## Resources
 
 - [VsCode Extension API](https://code.visualstudio.com/api)
