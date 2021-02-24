@@ -1,4 +1,8 @@
 
 * {
-    font-family: 'Noto Sans', sans-serif;
+    font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Noto Sans, sans-serif;
+}
+
+textarea {
+    font-weight: normal !important;
 }
