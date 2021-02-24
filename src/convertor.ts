@@ -199,13 +199,7 @@ export class Board implements IBoard {
         };
         this.markdownAST.children.push(laneHeadingNode); // Add lane title to AST.
 
-        const laneChildrenNode = {
-            "type": "list",
-            "children": []
-        };
-        this.markdownAST.children.push(laneChildrenNode); // Add empty card list to the AST.
-
-        this.laneMap[laneId] = [laneHeadingNode, laneChildrenNode]; // Keep track of the new nodes for the new lane.
+        this.laneMap[laneId] = [laneHeadingNode, undefined]; // Keep track of the new nodes for the new lane.
     }
 
     //
@@ -271,7 +265,26 @@ export class Board implements IBoard {
     // Adds a new task to the lane.
     //
     addNewTask(laneId: string, cardId: string, cardTitle: string): void {
-        const laneChildrenNode = this.laneMap[laneId][1];
+        let laneChildrenNode = this.laneMap[laneId][1];
+        if (laneChildrenNode === undefined) {
+            // 
+            // No children yet.
+            //
+            laneChildrenNode = {
+                "type": "list",
+                "children": []
+            };
+            this.laneMap[laneId][1] = laneChildrenNode; // Save it.
+
+            const laneNode = this.laneMap[laneId][0];
+            const laneIndex = this.markdownAST.children.indexOf(laneNode);
+            if (laneIndex === -1) {
+                throw new Error(`Lane wasn't found in markdown AST.`);
+            }
+
+            this.markdownAST.children.splice(laneIndex+1, 0, laneChildrenNode); // Splice in the list that contains the cards.
+        }
+
         const newCardNode = {
             "type": "listItem",
             "children": [

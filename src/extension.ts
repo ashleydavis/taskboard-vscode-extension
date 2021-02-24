@@ -167,7 +167,7 @@ function onPanelDidReceiveMessage(message: any) {
 
         switch (message.type) {
             case "add-lane": {
-                currentBoard!.addNewLane(message.id,  message.title, );
+                currentBoard!.addNewLane(message.id,  message.title);
                 break;
             }
 
