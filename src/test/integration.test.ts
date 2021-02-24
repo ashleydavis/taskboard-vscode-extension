@@ -51,7 +51,13 @@ describe("integration", () => {
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
         const board = parseKanbanBoard(markdownAST, () => "ABCD");
         expect(board.boardData).toEqual({
-            "lanes": [],
+            "lanes": [
+                {
+                    "id": "ABCD",
+                    "title": "Todo",
+                    "cards": []
+                }
+            ]
         });
 
     });    
@@ -62,7 +68,7 @@ describe("integration", () => {
         const markdownAST = fromMarkdownProcessor.parse(testMarkdown);
         const board = parseKanbanBoard(markdownAST, () => "ABCD");
         expect(board.boardData).toEqual({
-            "lanes": [],
+            "lanes": []
         });
     });    
 

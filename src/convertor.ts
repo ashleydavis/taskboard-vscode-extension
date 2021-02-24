@@ -351,22 +351,23 @@ export function parseKanbanBoard(markdownAST: any, makeUuid?: () => string): IBo
     for (let childIndex = 0; childIndex < children.length; childIndex += 1) {
         const laneNode = children[childIndex];
         if (laneNode.type === "heading" && laneNode.depth === 3) {
+            const laneId = makeUuid ? makeUuid() : v4();
+            const lane: ILaneData = {
+                id: laneId,
+                title: laneNode.children[0].value,
+                cards: [],
+            };
+            board.boardData.lanes.push(lane);
+            board.laneMap[laneId] = [laneNode, undefined];
+
             const nextChildIndex = childIndex + 1;
             if (nextChildIndex < children.length) {               
                 const cardsListNode = children[nextChildIndex];
                 if (cardsListNode && cardsListNode.type === "list") {
-                    const laneId = makeUuid ? makeUuid() : v4();
-                    const lane: ILaneData = {
-                        id: laneId,
-                        title: laneNode.children[0].value,
-                        cards: [],
-                    };
-                    board.boardData.lanes.push(lane);
                     
-                    parseCards(cardsListNode, makeUuid, lane, board);
-
                     board.laneMap[laneId] = [laneNode, cardsListNode];
-        
+
+                    parseCards(cardsListNode, makeUuid, lane, board);
                     childIndex += 1;
                 }    
             }
