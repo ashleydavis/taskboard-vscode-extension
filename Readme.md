@@ -2,7 +2,7 @@
 
 A Kanban board extension for Visual Studio Code.
 
-Edit your [todo.md format](https://github.com/todomd/todo.md) markdown files a Kanban boards without leaving VS Code!
+Edit your [todo.md format](https://github.com/todomd/todo.md) markdown files as Kanban boards without leaving VS Code!
 
 I've live streamed the development of this project on Twitch.
 
@@ -51,7 +51,7 @@ Follow the developer on Twitter for updates: [https://twitter.com/ashleydavis75]
 
 ### Contribute
 
-- Interested in contributing to this project? Please see [the development guide](Development). 
+- Interested in contributing to this project? Please see [the development guide](Development.md). 
 - Fork the project, make your changes and submit your pull request.
 
 
