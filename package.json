@@ -2,6 +2,10 @@
   "name": "taskboard",
   "displayName": "Taskboard",
   "publisher": "ashleydavis",
+  "author": {
+    "name": "Ashley Davis",
+    "email": "ashley@codecapers.com.au"
+  },
   "description": "Edit your taskboard without leaving Visual Studio Code! (TODO.md format)",
   "version": "0.0.1",
   "homepage": "https://github.com/ashleydavis/taskboard-vscode-extension/blob/master/Readme.md",
