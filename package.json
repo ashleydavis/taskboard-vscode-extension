@@ -4,7 +4,15 @@
   "publisher": "ashleydavis",
   "description": "Edit your taskboard without leaving Visual Studio Code! (TODO.md format)",
   "version": "0.0.1",
-  "repository": "https://github.com/ashleydavis/taskboard-vscode-extension",
+  "homepage": "https://github.com/ashleydavis/taskboard-vscode-extension/blob/master/Readme.md",
+  "bugs": {
+    "url": "https://github.com/ashleydavis/taskboard-vscode-extension/issues",
+    "email": "ashley@codecapers.com.au"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ashleydavis/taskboard-vscode-extension"
+  },
   "engines": {
     "vscode": "^1.36.0"
   },
