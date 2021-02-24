@@ -58,5 +58,6 @@ Follow the developer on Twitter for updates: [https://twitter.com/ashleydavis75]
 
 ### Support the developer
 
+- [Star the Git repo for this project](https://github.com/ashleydavis/taskboard-vscode-extension)
 - [See how to support my development efforts](http://www.codecapers.com.au/#support-my-work)
 
