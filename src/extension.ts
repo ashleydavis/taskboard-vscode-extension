@@ -49,7 +49,7 @@ function openKanbanBoardView(context: vscode.ExtensionContext): void {
 
     const panel = vscode.window.createWebviewPanel(
         "taskboard-extension",
-        "Kanban board",
+        "Taskboard",
         vscode.ViewColumn.One,
         showOptions
     );

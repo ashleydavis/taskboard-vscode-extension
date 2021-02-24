@@ -38,7 +38,7 @@
     "vscode:prepublish": "rm -rf ./out && npm run compile",
     "compile": "cd react-app && npm run build && cd .. && webpack --mode production && copy react-app\\dist\\index.html out\\index.html",
     "webpack": "webpack --mode development",
-    "webpack-dev": "webpack --mode development --watch",    
+    "webpack-dev": "webpack --mode development --watch",
     "test-compile": "tsc -p ./",
     "test": "jest",
     "test:watch": "jest --watch"
