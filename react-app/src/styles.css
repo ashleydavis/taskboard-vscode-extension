@@ -5,4 +5,10 @@
 
 textarea {
     font-weight: normal !important;
+    font-size: 14px !important;
+    color: #172b4d !important;
+}
+
+section > header > span > textarea {
+    font-weight: 600 !important;
 }
