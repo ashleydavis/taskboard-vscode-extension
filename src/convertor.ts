@@ -199,7 +199,13 @@ export class Board implements IBoard {
         };
         this.markdownAST.children.push(laneHeadingNode); // Add lane title to AST.
 
-        this.laneMap[laneId] = [laneHeadingNode, undefined]; // Keep track of the new nodes for the new lane.
+        const laneChildrenNode = {
+            "type": "list",
+            "children": [],
+        };
+        this.markdownAST.children.push(laneChildrenNode); // Add node to contain the lane's cards.
+
+        this.laneMap[laneId] = [laneHeadingNode, laneChildrenNode]; // Keep track of the new nodes for the new lane.
     }
 
     //
