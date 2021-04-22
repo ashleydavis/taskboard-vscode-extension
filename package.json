@@ -7,7 +7,7 @@
     "email": "ashley@codecapers.com.au"
   },
   "description": "Edit your taskboard without leaving Visual Studio Code! (TODO.md format)",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/ashleydavis/taskboard-vscode-extension/blob/master/Readme.md",
   "bugs": {
     "url": "https://github.com/ashleydavis/taskboard-vscode-extension/issues",
