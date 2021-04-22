@@ -58,5 +58,9 @@ code --install-extension taskboard-0.0.1.vsix
 
 - [VsCode Extension API](https://code.visualstudio.com/api)
 - [VsCode WebView API](https://code.visualstudio.com/api/extension-guides/webview)
+- [Debugging extensions - VS Code docs](https://vscode.readthedocs.io/en/latest/extensions/debugging-extensions/)
+- [Debugging extensions - StackOverflow](https://stackoverflow.com/questions/51164279/how-to-debug-visual-studio-code-extensions)
+- [Bundling extensions](https://code.visualstudio.com/api/working-with-extensions/bundling-extension    )
+- [Publishing extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
 - [React](https://reactjs.org/)
 
