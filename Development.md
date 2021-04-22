@@ -62,5 +62,6 @@ code --install-extension taskboard-0.0.1.vsix
 - [Debugging extensions - StackOverflow](https://stackoverflow.com/questions/51164279/how-to-debug-visual-studio-code-extensions)
 - [Bundling extensions](https://code.visualstudio.com/api/working-with-extensions/bundling-extension    )
 - [Publishing extensions](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)
+- [Docs for package.json](https://code.visualstudio.com/api/references/extension-manifest)
 - [React](https://reactjs.org/)
 
