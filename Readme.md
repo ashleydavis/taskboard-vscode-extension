@@ -10,7 +10,7 @@ For future live streams see Twitch: [https://www.twitch.tv/ashleydavis](https://
 
 Catch up with old streams on YouTube: [https://www.youtube.com/playlist?list=PLQrB0_KjTmHh55dysxFCQDruSC6Dfbt7W](https://www.youtube.com/playlist?list=PLQrB0_KjTmHh55dysxFCQDruSC6Dfbt7W)
 
-Follow the developer on Twitter for updates: [https://twitter.com/ashleydavis75](https://twitter.com/ashleydavis75)
+If you like this project, please star this repo and [support my work](https://www.codecapers.com.au/about#support-my-work)
 
 **NOTE:** This Readme is viewable as a Taskboard in VS Code.
 
