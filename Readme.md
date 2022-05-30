@@ -47,7 +47,7 @@ If you like this project, please star this repo and [support my work](https://ww
 ### Get support
 
 - [Log an issue](https://github.com/ashleydavis/taskboard-vscode-extension/issues)
-- Email: ashley@codecaper.com.au
+- Email: ashley@codecapers.com.au
 
 ### Contribute
 
